@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _changePage,
-        selectedItemColor: const Color(0xFF27AE60),
+        selectedItemColor: const Color(0xFF17AC64),
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         items: const [
@@ -110,7 +110,7 @@ class BerandaContent extends StatelessWidget {
                       icon: Icons.qr_code_scanner,
                       title: "Pindai Sekarang",
                       subtitle: "Lihat nilai dan ide kreatif barangmu.",
-                      color: const Color(0xFF27AE60),
+                      color: const Color(0xFF17AC64),
                       textColor: Colors.white,
                     ),
                   ),
@@ -126,7 +126,7 @@ class BerandaContent extends StatelessWidget {
                       title: "Cari Ide Daur Ulang",
                       subtitle: "Lihat berbagai ide dan inspirasi.",
                       color: Colors.white,
-                      textColor: const Color(0xFF27AE60),
+                      textColor: const Color(0xFF17AC64),
                       isOutline: true,
                     ),
                   ),
