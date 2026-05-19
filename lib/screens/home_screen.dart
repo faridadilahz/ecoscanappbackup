@@ -87,7 +87,7 @@ class BerandaContent extends StatelessWidget {
                     children: [
                       Icon(Icons.menu, color: Colors.green[800]),
                       const CircleAvatar(
-                        radius: 18,
+                        radius: 21,
                         backgroundColor: Color(0xFFE57373),
                         child: Text('S', style: TextStyle(color: Colors.white)),
                       ),
