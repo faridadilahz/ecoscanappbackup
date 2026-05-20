@@ -17,32 +17,32 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
     {
       "title": "Gambar Pola",
       "desc": "Buat pola pada botol bekas sesuai kreativitasmu, seperti hewan, bunga, atau buah-buahan.",
-      "image": "https://illustrations.popsy.co/emerald/creativity.svg", 
+      "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr 1.png", 
     },
     {
       "title": "Potong Sesuai Pola",
       "desc": "Gunakan gunting atau cutter untuk memotong botol mengikuti garis pola yang sudah digambar.",
-      "image": "https://illustrations.popsy.co/emerald/crafting.svg",
+      "image": "lib/features/eksplor/images/undraw_making-art_c05m 2.png",
     },
     {
       "title": "Beri Warna Dasar",
       "desc": "Siapkan cat akrilik lalu warnai seluruh permukaan botol dengan warna dasar, misalnya putih.",
-      "image": "https://illustrations.popsy.co/emerald/designer.svg",
+      "image": "lib/features/eksplor/images/undraw_choose-color_wpfw 1.png",
     },
     {
       "title": "Tambahkan Warna",
       "desc": "Warnai kembali sesuai karakter atau desain yang telah kamu buat sebelumnya.",
-      "image": "https://illustrations.popsy.co/emerald/abstract-art.svg",
+      "image": "lib/features/eksplor/images/undraw_add-color_6211 1.png",
     },
     {
       "title": "Keringkan Cat",
-      "desc": "Diamkan hingga cat benar-benar kering agar tidak luntur.",
-      "image": "https://illustrations.popsy.co/emerald/relaxed-womans-back.svg",
+      "desc": "Diamkan sebentar hingga cat benar-benar kering agar cat tidak luntur.",
+      "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn 1.png",
     },
     {
       "title": "Pot Siap Digunakan",
       "desc": "Botol bekas kini siap dijadikan pot bunga yang cantik dan bermanfaat.",
-      "image": "https://illustrations.popsy.co/emerald/gardening.svg",
+      "image": "lib/features/eksplor/images/scissors 1.png",
     },
   ];
 
