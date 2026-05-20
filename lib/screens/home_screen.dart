@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 // Nanti kalo temen lo udah kelar, import-nya di sini:
 // import 'package:ecoscan/features/pindai/pages/pindai_page.dart';
 import 'package:ecoscan/features/eksplor/pages/eksplor_page.dart';
+import 'package:ecoscan/features/pindai/pages/pindai_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,8 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // List halaman: Di sini tempat lo nyatuin kerjaan temen lo
     final List<Widget> _pages = [
       BerandaContent(onTapMenu: _changePage),
-      // Ganti 'Center' ini sama 'PindaiPage()' kalo temen lo udah setor code
-      const Center(child: Text("Halaman Pindai (Kamera)")), 
+      const PindaiScreen(), 
       // Ganti 'Center' ini sama 'EksplorPage()' kalo temen lo udah setor code
       const EksplorPage(),
     ];
