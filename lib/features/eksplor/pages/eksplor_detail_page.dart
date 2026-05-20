@@ -116,7 +116,7 @@ class EksplorDetailPage extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text.rich(
                     TextSpan(
-                      text: "",
+                      text: "Meowholder adalah tempat pensil berbahan dasar botol plastik bekas yang dirancang menyerupai tubuh kucing. Desainnya unik karena tidak hanya berfungsi sebagai tempat penyimpanan alat tulis, tetapi juga memiliki bentuk yang lucu dan menarik sehingga dapat mempercantik meja belajar.",
                       style: const TextStyle(color: Colors.black45, fontSize: 14, height: 1.4),
                       children: [
                       
