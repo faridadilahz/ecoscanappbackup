@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ecoscan/screens/home_screen.dart';
+import 'package:ecoscan/screens/onboarding_screen.dart';
 
 void main() {
   runApp(const EcoScanApp());
@@ -19,7 +20,7 @@ class EcoScanApp extends StatelessWidget {
         fontFamily: 'Bricolage-Grotesque', 
         useMaterial3: true, // Pake style Material 3 yang lebih modern
       ),
-      home: const HomeScreen(), // Arahkan ke class yang ada di home_screen.dart
+      home: const OnboardingScreen(), // Arahkan ke class yang ada di home_screen.dart
     );
   }
 }
