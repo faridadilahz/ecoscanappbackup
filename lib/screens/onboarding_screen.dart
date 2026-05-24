@@ -1,6 +1,7 @@
 import 'package:ecoscan/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
+//Class Onboarding
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
