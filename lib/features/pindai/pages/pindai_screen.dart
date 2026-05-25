@@ -1,4 +1,13 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart'; 
+import 'package:image_picker/image_picker.dart'; 
+
+// IMPORT HOME SCREEN
+import 'package:ecoscan/screens/home_screen.dart'; 
+
+// Pastikan file ini ada di proyek Anda
 import 'pengepul_screen.dart';
 import 'detail_karya_screen.dart'; 
 
@@ -13,12 +22,31 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
   bool _isScanning = false;
   bool _showHasil = false; 
   late AnimationController _animationController;
+  
+  // Controller untuk Live Camera Laptop/HP
+  CameraController? _cameraController;
+  List<CameraDescription>? _cameras;
+  bool _isCameraInitialized = false;
+
+  // Variabel alternatif jika user memilih dari galeri
+  XFile? _galleryImage; 
+  final ImagePicker _picker = ImagePicker();
 
   final Color primaryGreen = const Color(0xFF27AE60);
+
+  // Ukuran kotak scanner
+  final double boxWidth = 320.0;
+  final double boxHeight = 460.0;
 
   @override
   void initState() {
     super.initState();
+    _initLaserAnimation();
+    _initLaptopCamera(); 
+  }
+
+  // Inisialisasi Animasi Laser
+  void _initLaserAnimation() {
     _animationController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
@@ -31,12 +59,91 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
       });
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
+  // Fungsi mengaktifkan Webcam Laptop / Kamera HP secara Live
+  Future<void> _initLaptopCamera() async {
+    try {
+      _cameras = await availableCameras();
+      if (_cameras != null && _cameras!.isNotEmpty) {
+        
+        CameraDescription selectedCamera = _cameras![0];
+        
+        // Optimasi khusus: Jika berjalan di Android/Emulator, prioritaskan kamera belakang (back)
+        if (!kIsWeb && Platform.isAndroid) {
+          for (var camera in _cameras!) {
+            if (camera.lensDirection == CameraLensDirection.back) {
+              selectedCamera = camera;
+              break;
+            }
+          }
+        }
+
+        _cameraController = CameraController(
+          selectedCamera,
+          ResolutionPreset.medium,
+          imageFormatGroup: ImageFormatGroup.jpeg,
+        );
+
+        await _cameraController!.initialize();
+        if (mounted) {
+          setState(() {
+            _isCameraInitialized = true;
+          });
+        }
+      } else {
+        _showErrorSnackBar("Kamera tidak ditemukan di perangkat ini.");
+      }
+    } catch (e) {
+      debugPrint("Gagal membuka webcam/kamera: $e");
+      _showErrorSnackBar("Gagal memuat kamera. Periksa izin akses perangkat Anda.");
+    }
   }
 
+  void _showErrorSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+  }
+
+  // Fungsi: Mengambil gambar dari Galeri
+  Future<void> _getImageFromGallery() async {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        setState(() {
+          _galleryImage = image;
+          _showHasil = false; 
+        });
+        _startScan();
+      }
+    } catch (e) {
+      debugPrint("Error membuka galeri: $e");
+    }
+  }
+
+  // Fungsi: Mengambil Foto dari Live Stream Webcam Laptop / HP
+  Future<void> _captureLiveCamera() async {
+    if (_cameraController == null || !_cameraController!.value.isInitialized) {
+      _showErrorSnackBar("Kamera belum siap atau tidak terdeteksi.");
+      return;
+    }
+
+    try {
+      final XFile shotImage = await _cameraController!.takePicture();
+      setState(() {
+        _galleryImage = shotImage; 
+      });
+      _startScan(); 
+    } catch (e) {
+      debugPrint("Gagal menjepret gambar dari webcam: $e");
+    }
+  }
+
+  // Fungsi: Jalannya Animasi Scan
   void _startScan() {
     setState(() {
       _isScanning = true;
@@ -44,15 +151,177 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
     });
     _animationController.forward();
 
+    // Simulasi scanning selama 3 detik
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         setState(() {
           _isScanning = false;
-          _showHasil = true; 
         });
         _animationController.stop();
+        
+        // Memunculkan Bottom Sheet secara otomatis & smooth setelah beres scan
+        _showHasilBottomSheet();
       }
     });
+  }
+
+  // Fungsi: Menampilkan Modal Bottom Sheet Hasil Analisis (Smooth Animation)
+  void _showHasilBottomSheet() {
+    setState(() {
+      _showHasil = true; 
+    });
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, 
+      backgroundColor: Colors.transparent, 
+      useSafeArea: true,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.5,
+          minChildSize: 0.3, 
+          maxChildSize: 0.92,
+          snap: true,
+          snapSizes: const [0.5, 0.92],
+          builder: (BuildContext context, ScrollController scrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(32),
+                  topRight: Radius.circular(32),
+                ),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView(
+                      controller: scrollController,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Botol Air Mineral',
+                                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Plastik • PET',
+                                  style: TextStyle(color: Colors.grey[400], fontSize: 14, fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                const Text(
+                                  'Rp4.000/kg',
+                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                                ),
+                                const SizedBox(height: 4),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const PengepulScreen()),
+                                    );
+                                  },
+                                  child: Text(
+                                    'Cari pengepul terdekat ↗',
+                                    style: TextStyle(color: primaryGreen, fontSize: 12, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: [
+                            const Text(
+                              'Ringkasan dari AI ',
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87),
+                            ),
+                            Icon(Icons.auto_awesome, color: primaryGreen, size: 16),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildFigmaScoreCard('Kebersihan', '90/100', 0.9),
+                            _buildFigmaScoreCard('Kondisi Fisik', '100/100', 1.0),
+                            _buildFigmaScoreCard('Kelayakan', '95/100', 0.95),
+                          ],
+                        ),
+                        const SizedBox(height: 32),
+                        const Text(
+                          'Rekomendasi Karya',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?w=300', 140),
+                                  _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=300', 110),
+                                  _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300', 150),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1530982011887-3cc11aa8893f?w=300', 95),
+                                  _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=300', 170),
+                                  _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=300', 120),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 40), 
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    ).then((_) {
+      // Ketika bottom sheet ditutup, tampilkan kembali kontrol bawah
+      setState(() {
+        _showHasil = false;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _cameraController?.dispose(); 
+    super.dispose();
   }
 
   @override
@@ -61,15 +330,30 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // 1. Kamera Latar Belakang Mockup
+          // 1. AREA PREVIEW LIVE KAMERA LAPTOP / GAMBAR GALERI
           Positioned.fill(
-            child: Image.network(
-              'https://images.unsplash.com/photo-1523293182086-7651a899d37f?q=80&w=600',
-              fit: BoxFit.cover,
-            ),
+            child: _galleryImage != null
+                ? (kIsWeb 
+                    ? Image.network(_galleryImage!.path, fit: BoxFit.cover) 
+                    : Image.file(File(_galleryImage!.path), fit: BoxFit.cover))
+                : (_isCameraInitialized
+                    ? CameraPreview(_cameraController!) 
+                    : const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(color: Color(0xFF27AE60)),
+                            SizedBox(height: 16),
+                            Text(
+                              "Menghubungkan ke kamera...",
+                              style: TextStyle(color: Colors.white, fontSize: 14),
+                            )
+                          ],
+                        ),
+                      )),
           ),
 
-          // 2. Tombol Navigasi Atas
+          // 2. TOMBOL NAVIGASI ATAS
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -81,62 +365,64 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       onPressed: () {
-                        // Menutup bottom sheet hasil dan mengembalikan ke tampilan awal PindaiScreen
-                        if (_showHasil || _isScanning) {
-                          setState(() {
-                            _showHasil = false;
-                            _isScanning = false;
-                          });
-                          _animationController.reset();
-                        }
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
+                          (route) => false,
+                        );
                       },
                     ),
                   ),
                   CircleAvatar(
                     backgroundColor: Colors.black45,
-                    child: IconButton(icon: const Icon(Icons.flash_on, color: Colors.white), onPressed: () {}),
+                    child: IconButton(
+                      icon: const Icon(Icons.flash_on, color: Colors.white), 
+                      onPressed: () {}, 
+                    ),
                   ),
                 ],
               ),
             ),
           ),
 
-          // 3. Kotak Target Scanner di Tengah
+          // 3. KOTAK TARGET SCANNER (Tengah)
           Center(
             child: Container(
-              width: 260,
-              height: 380,
+              width: boxWidth,
+              height: boxHeight,
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.white, width: 2.5),
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(32),
               ),
             ),
           ),
 
-          // 4. Animasi Laser
+          // 4. ANIMASI LASER SCANNER
           if (_isScanning)
             AnimatedBuilder(
               animation: _animationController,
               builder: (context, child) {
                 return Positioned(
-                  top: (MediaQuery.of(context).size.height * 0.5 - 190) + (_animationController.value * 380),
-                  left: MediaQuery.of(context).size.width * 0.5 - 130,
-                  width: 260,
+                  top: (MediaQuery.of(context).size.height * 0.5 - (boxHeight / 2)) + (_animationController.value * boxHeight),
+                  left: MediaQuery.of(context).size.width * 0.5 - (boxWidth / 2),
+                  width: boxWidth,
                   child: Container(
                     height: 4,
                     decoration: BoxDecoration(
                       color: primaryGreen,
-                      boxShadow: [BoxShadow(color: primaryGreen.withOpacity(0.6), blurRadius: 10, spreadRadius: 2)],
+                      boxShadow: [
+                        BoxShadow(color: primaryGreen.withOpacity(0.6), blurRadius: 10, spreadRadius: 2)
+                      ],
                     ),
                   ),
                 );
               },
             ),
 
-          // 5. Status Pill
+          // 5. STATUS PILL
           if (_isScanning)
             Positioned(
-              top: 120,
+              top: 100,
               left: 0,
               right: 0,
               child: Center(
@@ -154,182 +440,94 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
               ),
             ),
 
-          // 6. Tombol Shutter Pindai Utama
+          // 6. PANEL TOMBOL KONTROL (Bawah)
           if (!_isScanning && !_showHasil)
             Positioned(
-              bottom: 60,
+              bottom: 40,
               left: 0,
               right: 0,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  GestureDetector(
-                    onTap: _startScan,
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3),
-                      ),
-                      child: CircleAvatar(
-                        radius: 35,
-                        backgroundColor: primaryGreen,
-                        child: const Icon(Icons.document_scanner_outlined, color: Colors.white, size: 30),
+                  if (_galleryImage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: GestureDetector(
+                        onTap: _showHasilBottomSheet, 
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: primaryGreen, width: 1),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Lihat Hasil Analisis',
+                                style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(Icons.keyboard_arrow_up, color: primaryGreen, size: 18),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.photo_library, color: Colors.white, size: 28),
+                        onPressed: _getImageFromGallery,
+                      ),
+                      const SizedBox(width: 32), 
+                      GestureDetector(
+                        onTap: () {
+                          if (_galleryImage != null) {
+                            _showHasilBottomSheet(); 
+                          } else {
+                            _captureLiveCamera();
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 3),
+                          ),
+                          child: CircleAvatar(
+                            radius: 35,
+                            backgroundColor: primaryGreen,
+                            child: Icon(
+                              _galleryImage != null ? Icons.keyboard_arrow_up : Icons.qr_code_scanner, 
+                              color: Colors.white, 
+                              size: 35,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 32),
+                      IconButton(
+                        icon: const Icon(Icons.refresh, color: Colors.white, size: 28),
+                        onPressed: () {
+                          setState(() {
+                            _galleryImage = null;
+                            _showHasil = false;
+                          });
+                        },
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
-                  const Text('Pindai', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(
+                    _galleryImage != null ? 'Buka Hasil' : 'Pindai', 
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                 ],
               ),
             ),
-
-          // 7. Bottom Sheet Hasil Scan
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 650),
-            curve: Curves.easeOutCubic,
-            bottom: _showHasil ? 0 : -MediaQuery.of(context).size.height,
-            left: 0,
-            right: 0,
-            height: MediaQuery.of(context).size.height,
-            child: _showHasil 
-                ? DraggableScrollableSheet(
-                    initialChildSize: 0.5,
-                    minChildSize: 0.5,
-                    maxChildSize: 0.92, 
-                    snap: true,
-                    snapSizes: const [0.5, 0.92],
-                    builder: (BuildContext context, ScrollController scrollController) {
-                      return Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(32),
-                            topRight: Radius.circular(32),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 12),
-                            Container(
-                              width: 40,
-                              height: 5,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            
-                            Expanded(
-                              child: ListView(
-                                controller: scrollController,
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'Botol Air Mineral',
-                                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            'Plastik • PET',
-                                            style: TextStyle(color: Colors.grey[400], fontSize: 14, fontWeight: FontWeight.w500),
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            'Rp4.000/kg',
-                                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(builder: (context) => const PengepulScreen()),
-                                              );
-                                            },
-                                            child: Text(
-                                              'Cari pengepul terdekat ↗',
-                                              style: TextStyle(color: primaryGreen, fontSize: 12, fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 24),
-                                  
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        'Ringkasan dari AI ',
-                                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87),
-                                      ),
-                                      Icon(Icons.auto_awesome, color: primaryGreen, size: 16),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      _buildFigmaScoreCard('Kebersihan', '90/100', 0.9),
-                                      _buildFigmaScoreCard('Kondisi Fisik', '100/100', 1.0),
-                                      _buildFigmaScoreCard('Kelayakan', '95/100', 0.95),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 32),
-                                  
-                                  const Text(
-                                    'Rekomendasi Karya',
-                                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          children: [
-                                            _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?w=300', 140),
-                                            _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=300', 110),
-                                            _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300', 150),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          children: [
-                                            _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1530982011887-3cc11aa8893f?w=300', 95),
-                                            _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=300', 170),
-                                            _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=300', 120),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 40), 
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  )
-                : const SizedBox.shrink(),
-          ),
         ],
       ),
     );
