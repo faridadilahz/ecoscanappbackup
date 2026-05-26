@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-// Nanti kalo temen lo udah kelar, import-nya di sini:
-// import 'package:ecoscan/features/pindai/pages/pindai_page.dart';
 import 'package:ecoscan/features/eksplor/pages/eksplor_page.dart';
 import 'package:ecoscan/features/pindai/pages/pindai_screen.dart';
 
@@ -13,27 +11,34 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  int _previousIndex = 0; // Merujuk ke halaman terakhir sebelum pindah ke Pindai
 
   // Fungsi navigasi utama
   void _changePage(int index) {
     setState(() {
+      // Jika user mau pindah ke Pindai (index 1), catat halaman saat ini sebagai halaman terakhir
+      if (index == 1) {
+        _previousIndex = _currentIndex;
+      }
       _currentIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // List halaman: Di sini tempat lo nyatuin kerjaan temen lo
+    // List halaman yang disatukan
     final List<Widget> _pages = [
       BerandaContent(onTapMenu: _changePage),
-      const PindaiScreen(), 
-      // Ganti 'Center' ini sama 'EksplorPage()' kalo temen lo udah setor code
-      const EksplorPage(),
+      PindaiScreen(
+        onTapMenu: _changePage,
+        previousIndex: _previousIndex, // Kirim data halaman terakhir ke PindaiScreen
+      ), 
+      EksplorPage(onTapMenu: _changePage),
     ];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FBF9),
-      body: IndexedStack( // Pake ini biar state halaman nggak keriset pas pindah
+      body: IndexedStack( 
         index: _currentIndex,
         children: _pages,
       ),
@@ -53,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// --- KONTEN BERANDA (Tugas Lo) ---
+// --- KONTEN BERANDA ---
 class BerandaContent extends StatelessWidget {
   final Function(int) onTapMenu;
   const BerandaContent({super.key, required this.onTapMenu});
@@ -104,7 +109,7 @@ class BerandaContent extends StatelessWidget {
                   
                   // CTA 1: PINDAI
                   InkWell(
-                    onTap: () => onTapMenu(1), // Ini bakal lari ke index 1 (Pindai)
+                    onTap: () => onTapMenu(1), 
                     borderRadius: BorderRadius.circular(24),
                     child: _buildMenuCard(
                       icon: Icons.qr_code_scanner,
@@ -119,7 +124,7 @@ class BerandaContent extends StatelessWidget {
                   
                   // CTA 2: EKSPLOR
                   InkWell(
-                    onTap: () => onTapMenu(2), // Ini bakal lari ke index 2 (Eksplor)
+                    onTap: () => onTapMenu(2), 
                     borderRadius: BorderRadius.circular(24),
                     child: _buildMenuCard(
                       icon: Icons.search,

@@ -227,11 +227,15 @@ class _PengepulScreenState extends State<PengepulScreen> {
             // Pindai dipencet: langsung pop map ini untuk balik ke kamera awal
             Navigator.pop(context);
           } else if (index == 2) {
-            // Eksplor dipencet: LANGSUNG DIARAHIN KE EKSPLOR PAGE LEWAT ROUTE
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const EksplorPage()),
-            );
+            // ==========================================
+            // KODE FIX UNTUK EKSPLOR (GARIS MERAH HILANG)
+            // ==========================================
+            // Ubah index tab di HomeScreen jadi 2 (Eksplor), baru tutup halaman peta ini
+            final homeState = context.findAncestorStateOfType<State<HomeScreen>>();
+            if (homeState != null) {
+              (homeState as dynamic)._changePage(2);
+            }
+            Navigator.pop(context); // Tutup PengepulScreen, otomatis nampilin EksplorPage di HomeScreen
           }
         },
         selectedItemColor: const Color(0xFF17AC64),
