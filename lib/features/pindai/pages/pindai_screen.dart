@@ -4,15 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart'; 
 import 'package:image_picker/image_picker.dart'; 
 
-// IMPORT HOME SCREEN
-import 'package:ecoscan/screens/home_screen.dart'; 
-
-// Pastikan file ini ada di proyek Anda
 import 'pengepul_screen.dart';
-import 'detail_karya_screen.dart'; 
+import 'detail_karya_screen.dart'; // Catatan: Sesuaikan nama file jika aslinya detail_karya_page.dart
 
 class PindaiScreen extends StatefulWidget {
-  const PindaiScreen({super.key});
+  final Function(int) onTapMenu; // Terima fungsi navigasi dari HomeScreen
+  final int previousIndex;       // Terima index halaman terakhir
+
+  const PindaiScreen({
+    super.key,
+    required this.onTapMenu,
+    required this.previousIndex,
+  });
 
   @override
   State<PindaiScreen> createState() => _PindaiScreenState();
@@ -23,18 +26,15 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
   bool _showHasil = false; 
   late AnimationController _animationController;
   
-  // Controller untuk Live Camera Laptop/HP
   CameraController? _cameraController;
   List<CameraDescription>? _cameras;
   bool _isCameraInitialized = false;
 
-  // Variabel alternatif jika user memilih dari galeri
   XFile? _galleryImage; 
   final ImagePicker _picker = ImagePicker();
 
   final Color primaryGreen = const Color(0xFF27AE60);
 
-  // Ukuran kotak scanner
   final double boxWidth = 320.0;
   final double boxHeight = 460.0;
 
@@ -45,7 +45,6 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
     _initLaptopCamera(); 
   }
 
-  // Inisialisasi Animasi Laser
   void _initLaserAnimation() {
     _animationController = AnimationController(
       duration: const Duration(seconds: 2),
@@ -59,15 +58,12 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
       });
   }
 
-  // Fungsi mengaktifkan Webcam Laptop / Kamera HP secara Live
   Future<void> _initLaptopCamera() async {
     try {
       _cameras = await availableCameras();
       if (_cameras != null && _cameras!.isNotEmpty) {
-        
         CameraDescription selectedCamera = _cameras![0];
         
-        // Optimasi khusus: Jika berjalan di Android/Emulator, prioritaskan kamera belakang (back)
         if (!kIsWeb && Platform.isAndroid) {
           for (var camera in _cameras!) {
             if (camera.lensDirection == CameraLensDirection.back) {
@@ -109,7 +105,6 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
     }
   }
 
-  // Fungsi: Mengambil gambar dari Galeri
   Future<void> _getImageFromGallery() async {
     try {
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -125,7 +120,6 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
     }
   }
 
-  // Fungsi: Mengambil Foto dari Live Stream Webcam Laptop / HP
   Future<void> _captureLiveCamera() async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
       _showErrorSnackBar("Kamera belum siap atau tidak terdeteksi.");
@@ -143,7 +137,6 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
     }
   }
 
-  // Fungsi: Jalannya Animasi Scan
   void _startScan() {
     setState(() {
       _isScanning = true;
@@ -151,21 +144,17 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
     });
     _animationController.forward();
 
-    // Simulasi scanning selama 3 detik
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         setState(() {
           _isScanning = false;
         });
         _animationController.stop();
-        
-        // Memunculkan Bottom Sheet secara otomatis & smooth setelah beres scan
         _showHasilBottomSheet();
       }
     });
   }
 
-  // Fungsi: Menampilkan Modal Bottom Sheet Hasil Analisis (Smooth Animation)
   void _showHasilBottomSheet() {
     setState(() {
       _showHasil = true; 
@@ -310,7 +299,6 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
         );
       },
     ).then((_) {
-      // Ketika bottom sheet ditutup, tampilkan kembali kontrol bawah
       setState(() {
         _showHasil = false;
       });
@@ -365,11 +353,10 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                          (route) => false,
-                        );
+                        // ==========================================
+                        // FIX PERUBAHAN: BALIK KE HALAMAN TERAKHIR
+                        // ==========================================
+                        widget.onTapMenu(widget.previousIndex);
                       },
                     ),
                   ),

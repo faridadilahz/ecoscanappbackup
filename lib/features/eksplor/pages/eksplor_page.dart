@@ -19,7 +19,9 @@ class DaurUlangModel {
 }
 
 class EksplorPage extends StatefulWidget {
-  const EksplorPage({super.key});
+  final Function(int) onTapMenu; // <-- 1. INI DIUBAH: nerima fungsi pindah indeks tab
+  
+  const EksplorPage({super.key, required this.onTapMenu}); // <-- 2. INI JUGA DIUBAH: jadi required
 
   @override
   State<EksplorPage> createState() => _EksplorPageState();
@@ -104,11 +106,10 @@ class _EksplorPageState extends State<EksplorPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FBF9),
-      // appBar bawaan Scaffold dihapus biar judul & tombol scan bisa ikut ke-scroll
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // 1. BAGIAN HEADER (Judul + Tombol Scan QR) yang bisa ikut ke-scroll
+            // 1. BAGIAN HEADER (Judul + Tombol Scan QR)
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 16.0, bottom: 8.0),
@@ -124,15 +125,10 @@ class _EksplorPageState extends State<EksplorPage> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.qr_code_scanner_rounded, color: Color(0xFF17AC64), size: 28),
+                      icon: const Icon(Icons.qr_code_scanner_rounded, color: Color(0xFF17AC64), size: 28), 
                       onPressed: () {
-                        // Navigasi ke PindaiScreen saat tombol QR ditekan
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PindaiScreen(),
-                          ),
-                        );
+                        // <-- 3. INI DIUBAH: panggil fungsi bawaan navbar buat pindah ke tab indeks 1 (Pindai)
+                        widget.onTapMenu(1); 
                       },
                       constraints: const BoxConstraints(),
                       padding: EdgeInsets.zero,
@@ -286,9 +282,9 @@ class _EksplorPageState extends State<EksplorPage> {
                           );
                         },
                         childCount: displayList.length,
+                      ),
                     ),
                   ),
-                ),
             
             const SliverToBoxAdapter(child: SizedBox(height: 20)),
           ],
