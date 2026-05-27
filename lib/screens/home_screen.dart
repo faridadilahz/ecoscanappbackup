@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ecoscan/features/eksplor/pages/eksplor_page.dart';
 import 'package:ecoscan/features/pindai/pages/pindai_screen.dart';
+import 'akun_beranda.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,7 +12,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  int _previousIndex = 0; // Merujuk ke halaman terakhir sebelum pindah ke Pindai
+  int _previousIndex =
+      0; // Merujuk ke halaman terakhir sebelum pindah ke Pindai
 
   // Fungsi navigasi utama
   void _changePage(int index) {
@@ -31,17 +33,15 @@ class _HomeScreenState extends State<HomeScreen> {
       BerandaContent(onTapMenu: _changePage),
       PindaiScreen(
         onTapMenu: _changePage,
-        previousIndex: _previousIndex, // Kirim data halaman terakhir ke PindaiScreen
-      ), 
+        previousIndex:
+            _previousIndex, // Kirim data halaman terakhir ke PindaiScreen
+      ),
       EksplorPage(onTapMenu: _changePage),
     ];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FBF9),
-      body: IndexedStack( 
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _changePage,
@@ -49,8 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Beranda"),
-          BottomNavigationBarItem(icon: Icon(Icons.qr_code_scanner_rounded), label: "Pindai"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_filled),
+            label: "Beranda",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.qr_code_scanner_rounded),
+            label: "Pindai",
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: "Eksplor"),
         ],
       ),
@@ -90,25 +96,45 @@ class BerandaContent extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      const CircleAvatar(
-                        radius: 21,
-                        backgroundColor: Color(0xFFE57373),
-                        child: Text('S', style: TextStyle(color: Colors.white)),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AkunBeranda(),
+                            ),
+                          );
+                        },
+                        child: const CircleAvatar(
+                          radius: 21,
+                          backgroundColor: Color(0xFFE57373),
+                          child: Text(
+                            'S',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 36),
-                  const Text("Halo! 👋", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                  const Text(
+                    "Halo! 👋",
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   const Text(
                     "Ayo ubah barang bekas\nbeserta sampah menjadi\nsebuah peluang yang\nbermanfaat ✨",
-                    style: TextStyle(fontSize: 20, color: Colors.black38, height: 1.3),
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.black38,
+                      height: 1.3,
+                    ),
                   ),
                   const SizedBox(height: 172),
-                  
+
                   // CTA 1: PINDAI
                   InkWell(
-                    onTap: () => onTapMenu(1), 
+                    onTap: () => onTapMenu(1),
                     borderRadius: BorderRadius.circular(24),
                     child: _buildMenuCard(
                       icon: Icons.qr_code_scanner,
@@ -118,12 +144,12 @@ class BerandaContent extends StatelessWidget {
                       textColor: Colors.white,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // CTA 2: EKSPLOR
                   InkWell(
-                    onTap: () => onTapMenu(2), 
+                    onTap: () => onTapMenu(2),
                     borderRadius: BorderRadius.circular(24),
                     child: _buildMenuCard(
                       icon: Icons.search,
@@ -157,15 +183,31 @@ class BerandaContent extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(24),
-        border: isOutline ? Border.all(color: textColor.withOpacity(0.2), width: 1.5) : null,
+        border: isOutline
+            ? Border.all(color: textColor.withOpacity(0.2), width: 1.5)
+            : null,
       ),
       child: Column(
         children: [
           Icon(icon, color: textColor, size: 42),
           const SizedBox(height: 14),
-          Text(title, style: TextStyle(color: textColor, fontSize: 20, fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 6),
-          Text(subtitle, textAlign: TextAlign.center, style: TextStyle(color: isOutline ? Colors.black38 : textColor.withOpacity(0.8), fontSize: 14)),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: isOutline ? Colors.black38 : textColor.withOpacity(0.8),
+              fontSize: 14,
+            ),
+          ),
         ],
       ),
     );
