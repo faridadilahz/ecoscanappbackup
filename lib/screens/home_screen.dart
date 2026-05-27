@@ -88,9 +88,8 @@ class BerandaContent extends StatelessWidget {
                 children: [
                   const SizedBox(height: 20),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Icon(Icons.menu, color: Colors.green[800]),
                       const CircleAvatar(
                         radius: 21,
                         backgroundColor: Color(0xFFE57373),
@@ -98,14 +97,14 @@ class BerandaContent extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 36),
                   const Text("Halo! 👋", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   const Text(
                     "Ayo ubah barang bekas\nbeserta sampah menjadi\nsebuah peluang yang\nbermanfaat ✨",
                     style: TextStyle(fontSize: 20, color: Colors.black38, height: 1.3),
                   ),
-                  const SizedBox(height: 144),
+                  const SizedBox(height: 172),
                   
                   // CTA 1: PINDAI
                   InkWell(

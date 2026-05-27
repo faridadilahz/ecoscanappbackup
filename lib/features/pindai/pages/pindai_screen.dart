@@ -1,15 +1,15 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart'; 
-import 'package:image_picker/image_picker.dart'; 
+import 'package:camera/camera.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'pengepul_screen.dart';
 import 'detail_karya_screen.dart'; // Catatan: Sesuaikan nama file jika aslinya detail_karya_page.dart
 
 class PindaiScreen extends StatefulWidget {
   final Function(int) onTapMenu; // Terima fungsi navigasi dari HomeScreen
-  final int previousIndex;       // Terima index halaman terakhir
+  final int previousIndex; // Terima index halaman terakhir
 
   const PindaiScreen({
     super.key,
@@ -21,16 +21,17 @@ class PindaiScreen extends StatefulWidget {
   State<PindaiScreen> createState() => _PindaiScreenState();
 }
 
-class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderStateMixin {
+class _PindaiScreenState extends State<PindaiScreen>
+    with SingleTickerProviderStateMixin {
   bool _isScanning = false;
-  bool _showHasil = false; 
+  bool _showHasil = false;
   late AnimationController _animationController;
-  
+
   CameraController? _cameraController;
   List<CameraDescription>? _cameras;
   bool _isCameraInitialized = false;
 
-  XFile? _galleryImage; 
+  XFile? _galleryImage;
   final ImagePicker _picker = ImagePicker();
 
   final Color primaryGreen = const Color(0xFF27AE60);
@@ -42,20 +43,19 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
   void initState() {
     super.initState();
     _initLaserAnimation();
-    _initLaptopCamera(); 
+    _initLaptopCamera();
   }
 
   void _initLaserAnimation() {
-    _animationController = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _animationController.reverse();
-        } else if (status == AnimationStatus.dismissed) {
-          _animationController.forward();
-        }
-      });
+    _animationController =
+        AnimationController(duration: const Duration(seconds: 2), vsync: this)
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed) {
+              _animationController.reverse();
+            } else if (status == AnimationStatus.dismissed) {
+              _animationController.forward();
+            }
+          });
   }
 
   Future<void> _initLaptopCamera() async {
@@ -63,7 +63,7 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
       _cameras = await availableCameras();
       if (_cameras != null && _cameras!.isNotEmpty) {
         CameraDescription selectedCamera = _cameras![0];
-        
+
         if (!kIsWeb && Platform.isAndroid) {
           for (var camera in _cameras!) {
             if (camera.lensDirection == CameraLensDirection.back) {
@@ -90,17 +90,16 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
       }
     } catch (e) {
       debugPrint("Gagal membuka webcam/kamera: $e");
-      _showErrorSnackBar("Gagal memuat kamera. Periksa izin akses perangkat Anda.");
+      _showErrorSnackBar(
+        "Gagal memuat kamera. Periksa izin akses perangkat Anda.",
+      );
     }
   }
 
   void _showErrorSnackBar(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.redAccent,
-        ),
+        SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
       );
     }
   }
@@ -111,7 +110,7 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
       if (image != null) {
         setState(() {
           _galleryImage = image;
-          _showHasil = false; 
+          _showHasil = false;
         });
         _startScan();
       }
@@ -129,9 +128,9 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
     try {
       final XFile shotImage = await _cameraController!.takePicture();
       setState(() {
-        _galleryImage = shotImage; 
+        _galleryImage = shotImage;
       });
-      _startScan(); 
+      _startScan();
     } catch (e) {
       debugPrint("Gagal menjepret gambar dari webcam: $e");
     }
@@ -140,7 +139,7 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
   void _startScan() {
     setState(() {
       _isScanning = true;
-      _showHasil = false; 
+      _showHasil = false;
     });
     _animationController.forward();
 
@@ -157,18 +156,18 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
 
   void _showHasilBottomSheet() {
     setState(() {
-      _showHasil = true; 
+      _showHasil = true;
     });
 
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, 
-      backgroundColor: Colors.transparent, 
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       useSafeArea: true,
       builder: (BuildContext context) {
         return DraggableScrollableSheet(
           initialChildSize: 0.5,
-          minChildSize: 0.3, 
+          minChildSize: 0.3,
           maxChildSize: 0.92,
           snap: true,
           snapSizes: const [0.5, 0.92],
@@ -195,7 +194,10 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                   Expanded(
                     child: ListView(
                       controller: scrollController,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -206,12 +208,20 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                               children: [
                                 const Text(
                                   'Botol Air Mineral',
-                                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   'Plastik • PET',
-                                  style: TextStyle(color: Colors.grey[400], fontSize: 14, fontWeight: FontWeight.w500),
+                                  style: TextStyle(
+                                    color: Colors.grey[400],
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ],
                             ),
@@ -220,19 +230,30 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                               children: [
                                 const Text(
                                   'Rp4.000/kg',
-                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
                                 ),
                                 const SizedBox(height: 4),
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => const PengepulScreen()),
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const PengepulScreen(),
+                                      ),
                                     );
                                   },
                                   child: Text(
                                     'Cari pengepul terdekat ↗',
-                                    style: TextStyle(color: primaryGreen, fontSize: 12, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      color: primaryGreen,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -244,9 +265,17 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                           children: [
                             const Text(
                               'Ringkasan dari AI ',
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87),
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
                             ),
-                            Icon(Icons.auto_awesome, color: primaryGreen, size: 16),
+                            Icon(
+                              Icons.auto_awesome,
+                              color: primaryGreen,
+                              size: 16,
+                            ),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -254,14 +283,22 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             _buildFigmaScoreCard('Kebersihan', '90/100', 0.9),
-                            _buildFigmaScoreCard('Kondisi Fisik', '100/100', 1.0),
+                            _buildFigmaScoreCard(
+                              'Kondisi Fisik',
+                              '100/100',
+                              1.0,
+                            ),
                             _buildFigmaScoreCard('Kelayakan', '95/100', 0.95),
                           ],
                         ),
                         const SizedBox(height: 32),
                         const Text(
                           'Rekomendasi Karya',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         Row(
@@ -270,9 +307,21 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                             Expanded(
                               child: Column(
                                 children: [
-                                  _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?w=300', 140),
-                                  _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=300', 110),
-                                  _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300', 150),
+                                  _buildInteractiveGridImage(
+                                    context,
+                                    'https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?w=300',
+                                    140,
+                                  ),
+                                  _buildInteractiveGridImage(
+                                    context,
+                                    'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=300',
+                                    110,
+                                  ),
+                                  _buildInteractiveGridImage(
+                                    context,
+                                    'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300',
+                                    150,
+                                  ),
                                 ],
                               ),
                             ),
@@ -280,15 +329,27 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                             Expanded(
                               child: Column(
                                 children: [
-                                  _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1530982011887-3cc11aa8893f?w=300', 95),
-                                  _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=300', 170),
-                                  _buildInteractiveGridImage(context, 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=300', 120),
+                                  _buildInteractiveGridImage(
+                                    context,
+                                    'https://images.unsplash.com/photo-1530982011887-3cc11aa8893f?w=300',
+                                    95,
+                                  ),
+                                  _buildInteractiveGridImage(
+                                    context,
+                                    'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=300',
+                                    170,
+                                  ),
+                                  _buildInteractiveGridImage(
+                                    context,
+                                    'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=300',
+                                    120,
+                                  ),
                                 ],
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 40), 
+                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
@@ -308,7 +369,7 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
   @override
   void dispose() {
     _animationController.dispose();
-    _cameraController?.dispose(); 
+    _cameraController?.dispose();
     super.dispose();
   }
 
@@ -321,24 +382,32 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
           // 1. AREA PREVIEW LIVE KAMERA LAPTOP / GAMBAR GALERI
           Positioned.fill(
             child: _galleryImage != null
-                ? (kIsWeb 
-                    ? Image.network(_galleryImage!.path, fit: BoxFit.cover) 
-                    : Image.file(File(_galleryImage!.path), fit: BoxFit.cover))
+                ? (kIsWeb
+                      ? Image.network(_galleryImage!.path, fit: BoxFit.cover)
+                      : Image.file(
+                          File(_galleryImage!.path),
+                          fit: BoxFit.cover,
+                        ))
                 : (_isCameraInitialized
-                    ? CameraPreview(_cameraController!) 
-                    : const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(color: Color(0xFF27AE60)),
-                            SizedBox(height: 16),
-                            Text(
-                              "Menghubungkan ke kamera...",
-                              style: TextStyle(color: Colors.white, fontSize: 14),
-                            )
-                          ],
-                        ),
-                      )),
+                      ? CameraPreview(_cameraController!)
+                      : const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(
+                                color: Color(0xFF27AE60),
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                "Menghubungkan ke kamera...",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )),
           ),
 
           // 2. TOMBOL NAVIGASI ATAS
@@ -363,8 +432,8 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                   CircleAvatar(
                     backgroundColor: Colors.black45,
                     child: IconButton(
-                      icon: const Icon(Icons.flash_on, color: Colors.white), 
-                      onPressed: () {}, 
+                      icon: const Icon(Icons.flash_on, color: Colors.white),
+                      onPressed: () {},
                     ),
                   ),
                 ],
@@ -390,15 +459,23 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
               animation: _animationController,
               builder: (context, child) {
                 return Positioned(
-                  top: (MediaQuery.of(context).size.height * 0.5 - (boxHeight / 2)) + (_animationController.value * boxHeight),
-                  left: MediaQuery.of(context).size.width * 0.5 - (boxWidth / 2),
+                  top:
+                      (MediaQuery.of(context).size.height * 0.5 -
+                          (boxHeight / 2)) +
+                      (_animationController.value * boxHeight),
+                  left:
+                      MediaQuery.of(context).size.width * 0.5 - (boxWidth / 2),
                   width: boxWidth,
                   child: Container(
                     height: 4,
                     decoration: BoxDecoration(
                       color: primaryGreen,
                       boxShadow: [
-                        BoxShadow(color: primaryGreen.withOpacity(0.6), blurRadius: 10, spreadRadius: 2)
+                        BoxShadow(
+                          color: primaryGreen.withOpacity(0.6),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
                       ],
                     ),
                   ),
@@ -414,14 +491,20 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
               right: 0,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: primaryGreen.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: const Text(
-                    'Mendeteksi...',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    'Memindai...',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -440,9 +523,12 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: GestureDetector(
-                        onTap: _showHasilBottomSheet, 
+                        onTap: _showHasilBottomSheet,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.black,
                             borderRadius: BorderRadius.circular(20),
@@ -453,10 +539,18 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                             children: [
                               Text(
                                 'Lihat Hasil Analisis',
-                                style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold, fontSize: 13),
+                                style: TextStyle(
+                                  color: primaryGreen,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
                               ),
                               const SizedBox(width: 4),
-                              Icon(Icons.keyboard_arrow_up, color: primaryGreen, size: 18),
+                              Icon(
+                                Icons.keyboard_arrow_up,
+                                color: primaryGreen,
+                                size: 18,
+                              ),
                             ],
                           ),
                         ),
@@ -466,14 +560,18 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.photo_library, color: Colors.white, size: 28),
+                        icon: const Icon(
+                          Icons.photo_library,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                         onPressed: _getImageFromGallery,
                       ),
-                      const SizedBox(width: 32), 
+                      const SizedBox(width: 32),
                       GestureDetector(
                         onTap: () {
                           if (_galleryImage != null) {
-                            _showHasilBottomSheet(); 
+                            _showHasilBottomSheet();
                           } else {
                             _captureLiveCamera();
                           }
@@ -486,18 +584,25 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                           ),
                           child: CircleAvatar(
                             radius: 35,
-                            backgroundColor: primaryGreen,
-                            child: Icon(
-                              _galleryImage != null ? Icons.keyboard_arrow_up : Icons.qr_code_scanner, 
-                              color: Colors.white, 
-                              size: 35,
-                            ),
+                            backgroundColor: Colors.white,
+                            // Pakai pengkondisian: kalau null, kasih Container kosong (SizedBox)
+                            child: _galleryImage != null
+                                ? Icon(
+                                    Icons.keyboard_arrow_up,
+                                    color: Colors.white,
+                                    size: 35,
+                                  )
+                                : const SizedBox.shrink(),
                           ),
                         ),
                       ),
                       const SizedBox(width: 32),
                       IconButton(
-                        icon: const Icon(Icons.refresh, color: Colors.white, size: 28),
+                        icon: const Icon(
+                          Icons.refresh,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                         onPressed: () {
                           setState(() {
                             _galleryImage = null;
@@ -509,8 +614,12 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    _galleryImage != null ? 'Buka Hasil' : 'Pindai', 
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                    _galleryImage != null ? 'Buka Hasil' : '',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),
@@ -532,8 +641,12 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title, 
-            style: const TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.w500),
+            title,
+            style: const TextStyle(
+              color: Colors.grey,
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           const SizedBox(height: 8),
           ClipRRect(
@@ -547,15 +660,23 @@ class _PindaiScreenState extends State<PindaiScreen> with SingleTickerProviderSt
           ),
           const SizedBox(height: 8),
           Text(
-            score, 
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey[400]),
+            score,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[400],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInteractiveGridImage(BuildContext context, String url, double height) {
+  Widget _buildInteractiveGridImage(
+    BuildContext context,
+    String url,
+    double height,
+  ) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
