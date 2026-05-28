@@ -10,11 +10,13 @@ import 'detail_karya_screen.dart'; // Catatan: Sesuaikan nama file jika aslinya 
 class PindaiScreen extends StatefulWidget {
   final Function(int) onTapMenu; // Terima fungsi navigasi dari HomeScreen
   final int previousIndex; // Terima index halaman terakhir
+  final bool isActive;
 
   const PindaiScreen({
     super.key,
     required this.onTapMenu,
     required this.previousIndex,
+    required this.isActive,
   });
 
   @override
@@ -24,7 +26,7 @@ class PindaiScreen extends StatefulWidget {
 class _PindaiScreenState extends State<PindaiScreen>
     with SingleTickerProviderStateMixin {
   bool _isScanning = false;
-  bool _showHasil = false;
+  int _scanSessionCounter = 0;
   late AnimationController _animationController;
 
   CameraController? _cameraController;
@@ -44,6 +46,17 @@ class _PindaiScreenState extends State<PindaiScreen>
     super.initState();
     _initLaserAnimation();
     _initLaptopCamera();
+  }
+
+  @override
+  void didUpdateWidget(covariant PindaiScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!widget.isActive && _isScanning) {
+      setState(() {
+        _isScanning = false;
+      });
+      _animationController.stop();
+    }
   }
 
   void _initLaserAnimation() {
@@ -110,7 +123,6 @@ class _PindaiScreenState extends State<PindaiScreen>
       if (image != null) {
         setState(() {
           _galleryImage = image;
-          _showHasil = false;
         });
         _startScan();
       }
@@ -137,14 +149,19 @@ class _PindaiScreenState extends State<PindaiScreen>
   }
 
   void _startScan() {
+    _scanSessionCounter++;
+    final currentSession = _scanSessionCounter;
     setState(() {
       _isScanning = true;
-      _showHasil = false;
     });
     _animationController.forward();
 
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
+      if (mounted &&
+          widget.isActive &&
+          _isScanning &&
+          _scanSessionCounter == currentSession &&
+          ModalRoute.of(context)?.isCurrent == true) {
         setState(() {
           _isScanning = false;
         });
@@ -155,16 +172,12 @@ class _PindaiScreenState extends State<PindaiScreen>
   }
 
   void _showHasilBottomSheet() {
-    setState(() {
-      _showHasil = true;
-    });
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       useSafeArea: true,
-      builder: (BuildContext context) {
+      builder: (BuildContext bottomSheetContext) {
         return DraggableScrollableSheet(
           initialChildSize: 0.5,
           minChildSize: 0.3,
@@ -239,6 +252,9 @@ class _PindaiScreenState extends State<PindaiScreen>
                                 const SizedBox(height: 4),
                                 GestureDetector(
                                   onTap: () {
+                                    // Tutup bottom sheet terlebih dahulu agar tidak ikut terbawa
+                                    Navigator.pop(bottomSheetContext);
+                                    
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -308,17 +324,17 @@ class _PindaiScreenState extends State<PindaiScreen>
                               child: Column(
                                 children: [
                                   _buildInteractiveGridImage(
-                                    context,
+                                    bottomSheetContext,
                                     'https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?w=300',
                                     140,
                                   ),
                                   _buildInteractiveGridImage(
-                                    context,
+                                    bottomSheetContext,
                                     'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=300',
                                     110,
                                   ),
                                   _buildInteractiveGridImage(
-                                    context,
+                                    bottomSheetContext,
                                     'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300',
                                     150,
                                   ),
@@ -330,17 +346,17 @@ class _PindaiScreenState extends State<PindaiScreen>
                               child: Column(
                                 children: [
                                   _buildInteractiveGridImage(
-                                    context,
+                                    bottomSheetContext,
                                     'https://images.unsplash.com/photo-1530982011887-3cc11aa8893f?w=300',
                                     95,
                                   ),
                                   _buildInteractiveGridImage(
-                                    context,
+                                    bottomSheetContext,
                                     'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=300',
                                     170,
                                   ),
                                   _buildInteractiveGridImage(
-                                    context,
+                                    bottomSheetContext,
                                     'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=300',
                                     120,
                                   ),
@@ -359,11 +375,7 @@ class _PindaiScreenState extends State<PindaiScreen>
           },
         );
       },
-    ).then((_) {
-      setState(() {
-        _showHasil = false;
-      });
-    });
+    );
   }
 
   @override
@@ -383,31 +395,31 @@ class _PindaiScreenState extends State<PindaiScreen>
           Positioned.fill(
             child: _galleryImage != null
                 ? (kIsWeb
-                      ? Image.network(_galleryImage!.path, fit: BoxFit.cover)
-                      : Image.file(
-                          File(_galleryImage!.path),
-                          fit: BoxFit.cover,
-                        ))
+                    ? Image.network(_galleryImage!.path, fit: BoxFit.cover)
+                    : Image.file(
+                        File(_galleryImage!.path),
+                        fit: BoxFit.cover,
+                      ))
                 : (_isCameraInitialized
-                      ? CameraPreview(_cameraController!)
-                      : const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(
-                                color: Color(0xFF27AE60),
+                    ? CameraPreview(_cameraController!)
+                    : const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              color: Color(0xFF27AE60),
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              "Menghubungkan ke kamera...",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
                               ),
-                              SizedBox(height: 16),
-                              Text(
-                                "Menghubungkan ke kamera...",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )),
+                            ),
+                          ],
+                        ),
+                      )),
           ),
 
           // 2. TOMBOL NAVIGASI ATAS
@@ -417,18 +429,21 @@ class _PindaiScreenState extends State<PindaiScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.black45,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () {
-                        // ==========================================
-                        // FIX PERUBAHAN: BALIK KE HALAMAN TERAKHIR
-                        // ==========================================
-                        widget.onTapMenu(widget.previousIndex);
-                      },
-                    ),
-                  ),
+                  _isScanning || _galleryImage != null
+                      ? CircleAvatar(
+                          backgroundColor: Colors.black45,
+                          child: IconButton(
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            onPressed: () {
+                              setState(() {
+                                _galleryImage = null;
+                                _isScanning = false;
+                              });
+                              _animationController.stop();
+                            },
+                          ),
+                        )
+                      : const SizedBox(width: 40, height: 40),
                   CircleAvatar(
                     backgroundColor: Colors.black45,
                     child: IconButton(
@@ -511,7 +526,7 @@ class _PindaiScreenState extends State<PindaiScreen>
             ),
 
           // 6. PANEL TOMBOL KONTROL (Bawah)
-          if (!_isScanning && !_showHasil)
+          if (!_isScanning)
             Positioned(
               bottom: 40,
               left: 0,
@@ -519,43 +534,6 @@ class _PindaiScreenState extends State<PindaiScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (_galleryImage != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: GestureDetector(
-                        onTap: _showHasilBottomSheet,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: primaryGreen, width: 1),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Lihat Hasil Analisis',
-                                style: TextStyle(
-                                  color: primaryGreen,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(
-                                Icons.keyboard_arrow_up,
-                                color: primaryGreen,
-                                size: 18,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -585,11 +563,10 @@ class _PindaiScreenState extends State<PindaiScreen>
                           child: CircleAvatar(
                             radius: 35,
                             backgroundColor: Colors.white,
-                            // Pakai pengkondisian: kalau null, kasih Container kosong (SizedBox)
                             child: _galleryImage != null
-                                ? Icon(
+                                ? const Icon(
                                     Icons.keyboard_arrow_up,
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     size: 35,
                                   )
                                 : const SizedBox.shrink(),
@@ -597,24 +574,12 @@ class _PindaiScreenState extends State<PindaiScreen>
                         ),
                       ),
                       const SizedBox(width: 32),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.refresh,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _galleryImage = null;
-                            _showHasil = false;
-                          });
-                        },
-                      ),
+                      const SizedBox(width: 48), // Spacer to balance the gallery button on the left
                     ],
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    _galleryImage != null ? 'Buka Hasil' : '',
+                    _galleryImage != null ? 'Buka Hasil Sebelumnya' : '',
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -673,16 +638,23 @@ class _PindaiScreenState extends State<PindaiScreen>
   }
 
   Widget _buildInteractiveGridImage(
-    BuildContext context,
+    BuildContext bSheetContext,
     String url,
     double height,
   ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const DetailKaryaPage()),
-        );
+        // 1. Tutup bottom sheet terlebih dahulu menggunakan bSheetContext
+        Navigator.pop(bSheetContext);
+
+        // 2. Transisi membuka halaman detail karya
+        Future.delayed(const Duration(milliseconds: 150), () {
+          if (!mounted) return;
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const DetailKaryaPage()),
+          );
+        });
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
