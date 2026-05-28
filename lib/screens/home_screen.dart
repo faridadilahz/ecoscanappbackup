@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onTapMenu: _changePage,
         previousIndex:
             _previousIndex, // Kirim data halaman terakhir ke PindaiScreen
+        isActive: _currentIndex == 1,
       ),
       EksplorPage(onTapMenu: _changePage),
     ];
