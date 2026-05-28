@@ -12,8 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  int _previousIndex =
-      0; // Merujuk ke halaman terakhir sebelum pindah ke Pindai
+  int _previousIndex = 0; // Merujuk ke halaman terakhir sebelum pindah ke Pindai
 
   // Fungsi navigasi utama
   void _changePage(int index) {
@@ -28,13 +27,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // List halaman yang disatukan
+    // List halaman yang disatukan (Sudah diperbaiki dari duplikasi)
     final List<Widget> _pages = [
       BerandaContent(onTapMenu: _changePage),
       PindaiScreen(
         onTapMenu: _changePage,
-        previousIndex:
-            _previousIndex, // Kirim data halaman terakhir ke PindaiScreen
+        previousIndex: _previousIndex, // Kirim data halaman terakhir ke PindaiScreen
+        currentIndex: _currentIndex,   // Mengirim indeks aktif saat ini
         isActive: _currentIndex == 1,
       ),
       EksplorPage(onTapMenu: _changePage),
@@ -58,7 +57,10 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.qr_code_scanner_rounded),
             label: "Pindai",
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Eksplor"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search), 
+            label: "Eksplor",
+          ),
         ],
       ),
     );

@@ -5,17 +5,19 @@ import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'pengepul_screen.dart';
-import 'detail_karya_screen.dart'; // Catatan: Sesuaikan nama file jika aslinya detail_karya_page.dart
+import 'detail_karya_screen.dart'; // Sesuaikan jika nama aslinya detail_karya_page.dart
 
 class PindaiScreen extends StatefulWidget {
   final Function(int) onTapMenu; // Terima fungsi navigasi dari HomeScreen
   final int previousIndex; // Terima index halaman terakhir
+  final int currentIndex;
   final bool isActive;
 
   const PindaiScreen({
     super.key,
     required this.onTapMenu,
     required this.previousIndex,
+    required this.currentIndex,
     required this.isActive,
   });
 
@@ -26,6 +28,7 @@ class PindaiScreen extends StatefulWidget {
 class _PindaiScreenState extends State<PindaiScreen>
     with SingleTickerProviderStateMixin {
   bool _isScanning = false;
+  bool _showHasil = false; // Menambahkan variabel state yang sebelumnya kurang deklarasi
   int _scanSessionCounter = 0;
   late AnimationController _animationController;
 
@@ -164,11 +167,29 @@ class _PindaiScreenState extends State<PindaiScreen>
           ModalRoute.of(context)?.isCurrent == true) {
         setState(() {
           _isScanning = false;
+          _showHasil = true;
         });
         _animationController.stop();
         _showHasilBottomSheet();
+      } else {
+        if (mounted) {
+          setState(() {
+            _isScanning = false;
+          });
+          _animationController.stop();
+        }
       }
     });
+  }
+
+  // Fungsi khusus untuk mereset seluruh state halaman kembali ke kamera awal
+  void _resetPindaiPage() {
+    setState(() {
+      _galleryImage = null;
+      _showHasil = false;
+      _isScanning = false;
+    });
+    _animationController.stop();
   }
 
   void _showHasilBottomSheet() {
@@ -375,7 +396,14 @@ class _PindaiScreenState extends State<PindaiScreen>
           },
         );
       },
-    );
+    ).then((_) {
+      // Ketika bottom sheet ditutup secara manual (di-swipe kebawah)
+      if (mounted) {
+        setState(() {
+          _showHasil = false;
+        });
+      }
+    });
   }
 
   @override
@@ -429,6 +457,8 @@ class _PindaiScreenState extends State<PindaiScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+
+                  // --- TOMBOL TENGAH (BACK JIKA PILIH GAMBAR) ---
                   _isScanning || _galleryImage != null
                       ? CircleAvatar(
                           backgroundColor: Colors.black45,
@@ -444,18 +474,22 @@ class _PindaiScreenState extends State<PindaiScreen>
                           ),
                         )
                       : const SizedBox(width: 40, height: 40),
+
+                  // --- TOMBOL KANAN (FLASH) ---
                   CircleAvatar(
                     backgroundColor: Colors.black45,
                     child: IconButton(
                       icon: const Icon(Icons.flash_on, color: Colors.white),
-                      onPressed: () {},
+                      onPressed: () {
+                        // Logika flash kamu (jika ada)
+                      },
                     ),
                   ),
                 ],
               ),
             ),
           ),
-
+          
           // 3. KOTAK TARGET SCANNER (Tengah)
           Center(
             child: Container(
@@ -474,8 +508,7 @@ class _PindaiScreenState extends State<PindaiScreen>
               animation: _animationController,
               builder: (context, child) {
                 return Positioned(
-                  top:
-                      (MediaQuery.of(context).size.height * 0.5 -
+                  top: (MediaQuery.of(context).size.height * 0.5 -
                           (boxHeight / 2)) +
                       (_animationController.value * boxHeight),
                   left:
@@ -498,7 +531,7 @@ class _PindaiScreenState extends State<PindaiScreen>
               },
             ),
 
-          // 5. STATUS PILL
+          // 5. STATUS PILL SCANNING
           if (_isScanning)
             Positioned(
               top: 100,
@@ -537,6 +570,7 @@ class _PindaiScreenState extends State<PindaiScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      // Tombol Galeri (Kiri)
                       IconButton(
                         icon: const Icon(
                           Icons.photo_library,
@@ -546,6 +580,8 @@ class _PindaiScreenState extends State<PindaiScreen>
                         onPressed: _getImageFromGallery,
                       ),
                       const SizedBox(width: 32),
+                      
+                      // Tombol Utama / Shutter (Tengah)
                       GestureDetector(
                         onTap: () {
                           if (_galleryImage != null) {
@@ -566,15 +602,16 @@ class _PindaiScreenState extends State<PindaiScreen>
                             child: _galleryImage != null
                                 ? const Icon(
                                     Icons.keyboard_arrow_up,
-                                    color: Colors.black,
+                                    color: Colors.black, // Menggunakan warna tunggal (bukan primaryGreen yang tertumpuk)
                                     size: 35,
                                   )
                                 : const SizedBox.shrink(),
                           ),
                         ),
                       ),
+                      
                       const SizedBox(width: 32),
-                      const SizedBox(width: 48), // Spacer to balance the gallery button on the left
+                      const SizedBox(width: 48), // Spacer penyeimbang tombol galeri kiri
                     ],
                   ),
                   const SizedBox(height: 12),
