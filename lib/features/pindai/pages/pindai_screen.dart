@@ -8,15 +8,17 @@ import 'pengepul_screen.dart';
 import 'detail_karya_screen.dart'; // Sesuaikan jika nama aslinya detail_karya_page.dart
 
 class PindaiScreen extends StatefulWidget {
-  final Function(int) onTapMenu; 
-  final int previousIndex; 
-  final int currentIndex; 
+  final Function(int) onTapMenu; // Terima fungsi navigasi dari HomeScreen
+  final int previousIndex; // Terima index halaman terakhir
+  final int currentIndex;
+  final bool isActive;
 
   const PindaiScreen({
     super.key,
     required this.onTapMenu,
     required this.previousIndex,
-    required this.currentIndex, 
+    required this.currentIndex,
+    required this.isActive,
   });
 
   @override
@@ -26,7 +28,8 @@ class PindaiScreen extends StatefulWidget {
 class _PindaiScreenState extends State<PindaiScreen>
     with SingleTickerProviderStateMixin {
   bool _isScanning = false;
-  bool _showHasil = false;
+  bool _showHasil = false; // Menambahkan variabel state yang sebelumnya kurang deklarasi
+  int _scanSessionCounter = 0;
   late AnimationController _animationController;
 
   CameraController? _cameraController;
@@ -46,6 +49,17 @@ class _PindaiScreenState extends State<PindaiScreen>
     super.initState();
     _initLaserAnimation();
     _initLaptopCamera();
+  }
+
+  @override
+  void didUpdateWidget(covariant PindaiScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!widget.isActive && _isScanning) {
+      setState(() {
+        _isScanning = false;
+      });
+      _animationController.stop();
+    }
   }
 
   void _initLaserAnimation() {
@@ -112,7 +126,6 @@ class _PindaiScreenState extends State<PindaiScreen>
       if (image != null) {
         setState(() {
           _galleryImage = image;
-          _showHasil = false;
         });
         _startScan();
       }
@@ -139,16 +152,22 @@ class _PindaiScreenState extends State<PindaiScreen>
   }
 
   void _startScan() {
+    _scanSessionCounter++;
+    final currentSession = _scanSessionCounter;
     setState(() {
       _isScanning = true;
-      _showHasil = false;
     });
     _animationController.forward();
 
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted && widget.currentIndex == 1) {
+      if (mounted &&
+          widget.isActive &&
+          _isScanning &&
+          _scanSessionCounter == currentSession &&
+          ModalRoute.of(context)?.isCurrent == true) {
         setState(() {
           _isScanning = false;
+          _showHasil = true;
         });
         _animationController.stop();
         _showHasilBottomSheet();
@@ -174,16 +193,12 @@ class _PindaiScreenState extends State<PindaiScreen>
   }
 
   void _showHasilBottomSheet() {
-    setState(() {
-      _showHasil = true;
-    });
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       useSafeArea: true,
-      builder: (BuildContext context) {
+      builder: (BuildContext bottomSheetContext) {
         return DraggableScrollableSheet(
           initialChildSize: 0.5,
           minChildSize: 0.3,
@@ -258,6 +273,9 @@ class _PindaiScreenState extends State<PindaiScreen>
                                 const SizedBox(height: 4),
                                 GestureDetector(
                                   onTap: () {
+                                    // Tutup bottom sheet terlebih dahulu agar tidak ikut terbawa
+                                    Navigator.pop(bottomSheetContext);
+                                    
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -327,17 +345,17 @@ class _PindaiScreenState extends State<PindaiScreen>
                               child: Column(
                                 children: [
                                   _buildInteractiveGridImage(
-                                    context,
+                                    bottomSheetContext,
                                     'https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?w=300',
                                     140,
                                   ),
                                   _buildInteractiveGridImage(
-                                    context,
+                                    bottomSheetContext,
                                     'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=300',
                                     110,
                                   ),
                                   _buildInteractiveGridImage(
-                                    context,
+                                    bottomSheetContext,
                                     'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300',
                                     150,
                                   ),
@@ -349,17 +367,17 @@ class _PindaiScreenState extends State<PindaiScreen>
                               child: Column(
                                 children: [
                                   _buildInteractiveGridImage(
-                                    context,
+                                    bottomSheetContext,
                                     'https://images.unsplash.com/photo-1530982011887-3cc11aa8893f?w=300',
                                     95,
                                   ),
                                   _buildInteractiveGridImage(
-                                    context,
+                                    bottomSheetContext,
                                     'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=300',
                                     170,
                                   ),
                                   _buildInteractiveGridImage(
-                                    context,
+                                    bottomSheetContext,
                                     'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=300',
                                     120,
                                   ),
@@ -433,32 +451,31 @@ class _PindaiScreenState extends State<PindaiScreen>
           ),
 
           // 2. TOMBOL NAVIGASI ATAS
-          // FIX: Diadopsi menggunakan Stack/SafeArea agar Flash selalu muncul sejak awal, 
-          // sedangkan tombol X hanya muncul jika gambar sudah dipilih (_galleryImage != null) dan tidak sedang memindai (!_isScanning)
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // --- TOMBOL KIRI (X / RESET) ---
-                  _galleryImage != null && !_isScanning
+
+                  // --- TOMBOL TENGAH (BACK JIKA PILIH GAMBAR) ---
+                  _isScanning || _galleryImage != null
                       ? CircleAvatar(
                           backgroundColor: Colors.black45,
                           child: IconButton(
-                            icon: const Icon(Icons.close, color: Colors.white),
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
                             onPressed: () {
-                              if (_showHasil) {
-                                Navigator.pop(context); // Tutup bottom sheet jika terbuka
-                              }
-                              _resetPindaiPage(); // Reset halaman ke kamera awal
+                              setState(() {
+                                _galleryImage = null;
+                                _isScanning = false;
+                              });
+                              _animationController.stop();
                             },
                           ),
                         )
-                      : const SizedBox(width: 40, height: 40), // Spacer kosong agar posisi flash di kanan tidak terganggu
+                      : const SizedBox(width: 40, height: 40),
 
                   // --- TOMBOL KANAN (FLASH) ---
-                  // FIX: Selalu dirender di setiap kondisi (awal buka kamera maupun setelah pilih gambar)
                   CircleAvatar(
                     backgroundColor: Colors.black45,
                     child: IconButton(
@@ -472,6 +489,7 @@ class _PindaiScreenState extends State<PindaiScreen>
               ),
             ),
           ),
+          
           // 3. KOTAK TARGET SCANNER (Tengah)
           Center(
             child: Container(
@@ -541,7 +559,7 @@ class _PindaiScreenState extends State<PindaiScreen>
             ),
 
           // 6. PANEL TOMBOL KONTROL (Bawah)
-          if (!_isScanning && !_showHasil)
+          if (!_isScanning)
             Positioned(
               bottom: 40,
               left: 0,
@@ -549,43 +567,6 @@ class _PindaiScreenState extends State<PindaiScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (_galleryImage != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: GestureDetector(
-                        onTap: _showHasilBottomSheet,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: primaryGreen, width: 1),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Lihat Hasil Analisis',
-                                style: TextStyle(
-                                  color: primaryGreen,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(
-                                Icons.keyboard_arrow_up,
-                                color: primaryGreen,
-                                size: 18,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -619,9 +600,9 @@ class _PindaiScreenState extends State<PindaiScreen>
                             radius: 35,
                             backgroundColor: Colors.white,
                             child: _galleryImage != null
-                                ? Icon(
+                                ? const Icon(
                                     Icons.keyboard_arrow_up,
-                                    color: primaryGreen,
+                                    color: Colors.black, // Menggunakan warna tunggal (bukan primaryGreen yang tertumpuk)
                                     size: 35,
                                   )
                                 : const SizedBox.shrink(),
@@ -629,13 +610,13 @@ class _PindaiScreenState extends State<PindaiScreen>
                         ),
                       ),
                       
-                      // FIX: Jarak penyeimbang kanan setelah tombol restart dihapus sepenuhnya
-                      const SizedBox(width: 60), 
+                      const SizedBox(width: 32),
+                      const SizedBox(width: 48), // Spacer penyeimbang tombol galeri kiri
                     ],
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    _galleryImage != null ? 'Buka Hasil' : '',
+                    _galleryImage != null ? 'Buka Hasil Sebelumnya' : '',
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -694,16 +675,23 @@ class _PindaiScreenState extends State<PindaiScreen>
   }
 
   Widget _buildInteractiveGridImage(
-    BuildContext context,
+    BuildContext bSheetContext,
     String url,
     double height,
   ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const DetailKaryaPage()),
-        );
+        // 1. Tutup bottom sheet terlebih dahulu menggunakan bSheetContext
+        Navigator.pop(bSheetContext);
+
+        // 2. Transisi membuka halaman detail karya
+        Future.delayed(const Duration(milliseconds: 150), () {
+          if (!mounted) return;
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const DetailKaryaPage()),
+          );
+        });
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
