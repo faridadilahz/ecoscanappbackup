@@ -5,16 +5,18 @@ import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'pengepul_screen.dart';
-import 'detail_karya_screen.dart'; // Catatan: Sesuaikan nama file jika aslinya detail_karya_page.dart
+import 'detail_karya_screen.dart'; // Sesuaikan jika nama aslinya detail_karya_page.dart
 
 class PindaiScreen extends StatefulWidget {
-  final Function(int) onTapMenu; // Terima fungsi navigasi dari HomeScreen
-  final int previousIndex; // Terima index halaman terakhir
+  final Function(int) onTapMenu; 
+  final int previousIndex; 
+  final int currentIndex; 
 
   const PindaiScreen({
     super.key,
     required this.onTapMenu,
     required this.previousIndex,
+    required this.currentIndex, 
   });
 
   @override
@@ -144,14 +146,31 @@ class _PindaiScreenState extends State<PindaiScreen>
     _animationController.forward();
 
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
+      if (mounted && widget.currentIndex == 1) {
         setState(() {
           _isScanning = false;
         });
         _animationController.stop();
         _showHasilBottomSheet();
+      } else {
+        if (mounted) {
+          setState(() {
+            _isScanning = false;
+          });
+          _animationController.stop();
+        }
       }
     });
+  }
+
+  // Fungsi khusus untuk mereset seluruh state halaman kembali ke kamera awal
+  void _resetPindaiPage() {
+    setState(() {
+      _galleryImage = null;
+      _showHasil = false;
+      _isScanning = false;
+    });
+    _animationController.stop();
   }
 
   void _showHasilBottomSheet() {
@@ -360,9 +379,12 @@ class _PindaiScreenState extends State<PindaiScreen>
         );
       },
     ).then((_) {
-      setState(() {
-        _showHasil = false;
-      });
+      // Ketika bottom sheet ditutup secara manual (di-swipe kebawah)
+      if (mounted) {
+        setState(() {
+          _showHasil = false;
+        });
+      }
     });
   }
 
@@ -383,64 +405,73 @@ class _PindaiScreenState extends State<PindaiScreen>
           Positioned.fill(
             child: _galleryImage != null
                 ? (kIsWeb
-                      ? Image.network(_galleryImage!.path, fit: BoxFit.cover)
-                      : Image.file(
-                          File(_galleryImage!.path),
-                          fit: BoxFit.cover,
-                        ))
+                    ? Image.network(_galleryImage!.path, fit: BoxFit.cover)
+                    : Image.file(
+                        File(_galleryImage!.path),
+                        fit: BoxFit.cover,
+                      ))
                 : (_isCameraInitialized
-                      ? CameraPreview(_cameraController!)
-                      : const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(
-                                color: Color(0xFF27AE60),
+                    ? CameraPreview(_cameraController!)
+                    : const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              color: Color(0xFF27AE60),
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              "Menghubungkan ke kamera...",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
                               ),
-                              SizedBox(height: 16),
-                              Text(
-                                "Menghubungkan ke kamera...",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )),
+                            ),
+                          ],
+                        ),
+                      )),
           ),
 
           // 2. TOMBOL NAVIGASI ATAS
+          // FIX: Diadopsi menggunakan Stack/SafeArea agar Flash selalu muncul sejak awal, 
+          // sedangkan tombol X hanya muncul jika gambar sudah dipilih (_galleryImage != null) dan tidak sedang memindai (!_isScanning)
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.black45,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () {
-                        // ==========================================
-                        // FIX PERUBAHAN: BALIK KE HALAMAN TERAKHIR
-                        // ==========================================
-                        widget.onTapMenu(widget.previousIndex);
-                      },
-                    ),
-                  ),
+                  // --- TOMBOL KIRI (X / RESET) ---
+                  _galleryImage != null && !_isScanning
+                      ? CircleAvatar(
+                          backgroundColor: Colors.black45,
+                          child: IconButton(
+                            icon: const Icon(Icons.close, color: Colors.white),
+                            onPressed: () {
+                              if (_showHasil) {
+                                Navigator.pop(context); // Tutup bottom sheet jika terbuka
+                              }
+                              _resetPindaiPage(); // Reset halaman ke kamera awal
+                            },
+                          ),
+                        )
+                      : const SizedBox(width: 40, height: 40), // Spacer kosong agar posisi flash di kanan tidak terganggu
+
+                  // --- TOMBOL KANAN (FLASH) ---
+                  // FIX: Selalu dirender di setiap kondisi (awal buka kamera maupun setelah pilih gambar)
                   CircleAvatar(
                     backgroundColor: Colors.black45,
                     child: IconButton(
                       icon: const Icon(Icons.flash_on, color: Colors.white),
-                      onPressed: () {},
+                      onPressed: () {
+                        // Logika flash kamu (jika ada)
+                      },
                     ),
                   ),
                 ],
               ),
             ),
           ),
-
           // 3. KOTAK TARGET SCANNER (Tengah)
           Center(
             child: Container(
@@ -459,8 +490,7 @@ class _PindaiScreenState extends State<PindaiScreen>
               animation: _animationController,
               builder: (context, child) {
                 return Positioned(
-                  top:
-                      (MediaQuery.of(context).size.height * 0.5 -
+                  top: (MediaQuery.of(context).size.height * 0.5 -
                           (boxHeight / 2)) +
                       (_animationController.value * boxHeight),
                   left:
@@ -483,7 +513,7 @@ class _PindaiScreenState extends State<PindaiScreen>
               },
             ),
 
-          // 5. STATUS PILL
+          // 5. STATUS PILL SCANNING
           if (_isScanning)
             Positioned(
               top: 100,
@@ -559,6 +589,7 @@ class _PindaiScreenState extends State<PindaiScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      // Tombol Galeri (Kiri)
                       IconButton(
                         icon: const Icon(
                           Icons.photo_library,
@@ -568,6 +599,8 @@ class _PindaiScreenState extends State<PindaiScreen>
                         onPressed: _getImageFromGallery,
                       ),
                       const SizedBox(width: 32),
+                      
+                      // Tombol Utama / Shutter (Tengah)
                       GestureDetector(
                         onTap: () {
                           if (_galleryImage != null) {
@@ -585,31 +618,19 @@ class _PindaiScreenState extends State<PindaiScreen>
                           child: CircleAvatar(
                             radius: 35,
                             backgroundColor: Colors.white,
-                            // Pakai pengkondisian: kalau null, kasih Container kosong (SizedBox)
                             child: _galleryImage != null
                                 ? Icon(
                                     Icons.keyboard_arrow_up,
-                                    color: Colors.white,
+                                    color: primaryGreen,
                                     size: 35,
                                   )
                                 : const SizedBox.shrink(),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 32),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.refresh,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _galleryImage = null;
-                            _showHasil = false;
-                          });
-                        },
-                      ),
+                      
+                      // FIX: Jarak penyeimbang kanan setelah tombol restart dihapus sepenuhnya
+                      const SizedBox(width: 60), 
                     ],
                   ),
                   const SizedBox(height: 12),

@@ -32,10 +32,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final List<Widget> _pages = [
       BerandaContent(onTapMenu: _changePage),
       PindaiScreen(
-        onTapMenu: _changePage,
-        previousIndex:
-            _previousIndex, // Kirim data halaman terakhir ke PindaiScreen
-      ),
+      onTapMenu: _changePage,
+      previousIndex: _previousIndex, // Kirim data halaman terakhir ke PindaiScreen
+      currentIndex: _currentIndex,   // FIX: Tambahkan baris ini (sesuaikan dengan nama variabel index-mu)
+    ),
       EksplorPage(onTapMenu: _changePage),
     ];
 
