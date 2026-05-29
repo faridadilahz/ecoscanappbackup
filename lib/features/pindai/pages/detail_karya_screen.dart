@@ -2,26 +2,32 @@ import 'package:flutter/material.dart';
 import 'panduan_interaktif_pindai.dart';
 
 class DetailKaryaPage extends StatelessWidget {
-  const DetailKaryaPage({super.key});
+  // 1. TAMBAHKAN VARIABEL UNTUK MENAMPUNG URL GAMBAR DINAMIS
+  final String imageUrl;
+
+  // 2. PASANGKAN DI CONSTRUCTOR (Hapus kata const paling depan karena nilainya dinamis)
+  const DetailKaryaPage({super.key, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
-    // Menyelaraskan warna hijau utama dengan eksplor_detail_page.dart (0xFF17AC64)
     final Color primaryGreen = const Color(0xFF17AC64);
 
-    // Menyesuaikan struktur data alat dan bahan agar bisa dirender dalam bentuk Grid 4 box
+    // DATA ALAT DAN BAHAN (Disesuaikan persis dengan gambar mockup)
     final List<Map<String, dynamic>> toolsAndMaterials = [
-      {"icon": Icons.content_cut_rounded, "label": "Gunting"},
-      {"icon": Icons.brush_rounded, "label": "Cat Warna"},
-      {"icon": Icons.opacity_rounded, "label": "Lem Glue"},
-      {"icon": Icons.layers_rounded, "label": "Aksesoris"},
+      {"icon": Icons.content_cut_rounded, "label": "Gunting/\nCutter"},
+      {"icon": Icons.format_color_fill_rounded, "label": "Cat Akrilik"},
+      {"icon": Icons.delete_outline_rounded, "label": "1 Botol\nPlastik"},
+      {"icon": Icons.edit_rounded, "label": "Pensil"},
     ];
 
-    // Mengubah data teks cara membuat menjadi List agar bisa dirender dengan format nomor terpisah
+    // DATA CARA MEMBUAT
     final List<String> steps = [
-      "Potong bagian tengah botol plastik bekas menjadi dua bagian menggunakan gunting.",
-      "Cat permukaan luar botol dengan warna dasar kesukaanmu, lalu tunggu hingga kering.",
-      "Gambar pola wajah hewan lucu atau pasang aksesoris pelengkap di pinggirannya.",
+      "Menggambar pola pada botol bekas yang akan kamu buat. Kamu bisa menggambar hewan, bunga, atau beberapa buah-buahan.",
+      "Kemudian gambar sesuka hati kamu, lalu potong mengikuti pola gambaran pada botol.",
+      "Kemudian siapkan cat akrilik, lalu warnai semua botol yang sudah digambar dengan warna dasar seperti putih.",
+      "Selanjutnya, kamu dapat mewarnai sesuai dengan karakter yang kamu buat, sesuaikan dengan gambaran serta pola yang sudah ada di botol sesuka hati.",
+      "Jika sudah diwarnai, keringkan botol agar cat tidak luntur.",
+      "Botol bekas sudah siap dijadikan sebagai pot bunga yang cantik."
     ];
 
     return Scaffold(
@@ -30,22 +36,21 @@ class DetailKaryaPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Header Menggunakan Stack Gambar Penuh ke Atas (Meniru gaya eksplor_detail_page)
+            // Header Gambar Dinamis (Mengikuti yang di-klik pengguna)
             Stack(
               children: [
                 Container(
                   height: 320,
                   width: double.infinity,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration( // Hapus const di sini karena memakai variabel imageUrl
                     image: DecorationImage(
-                      image: NetworkImage(
-                        'https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?w=500',
-                      ),
+                      // 3. GANTI URL STATIS DENGAN VARIABEL imageUrl
+                      image: NetworkImage(imageUrl), 
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                // Tombol Back Bulat Putih khas layout kamu
+                // Tombol Back Bulat Putih
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 20,
                   left: 20,
@@ -68,13 +73,13 @@ class DetailKaryaPage extends StatelessWidget {
               ],
             ),
 
-            // 2. Area Konten Utama
+            // Area Konten Utama
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Judul dan Detail Harga
+                  // Judul, Kategori, Harga, dan Status (Sesuai Gambar Mockup)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,7 +89,7 @@ class DetailKaryaPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Pot Tanaman',
+                              'Pot Tanaman Kucing',
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -92,9 +97,9 @@ class DetailKaryaPage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              "Daur Ulang Plastik • PET",
-                              style: const TextStyle(
+                            const Text(
+                              "Botol plastik • PET",
+                              style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.black38,
                               ),
@@ -106,7 +111,7 @@ class DetailKaryaPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           const Text(
-                            "Rp2.000",
+                            "Rp10.000",
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -115,12 +120,12 @@ class DetailKaryaPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Mudah • 15-30 Menit",
+                            "Mudah • 10-15 menit",
                             style: TextStyle(
                               fontSize: 13,
                               color: primaryGreen,
                               fontWeight: FontWeight.w600,
-                            ),
+                             ),
                           ),
                         ],
                       ),
@@ -128,21 +133,18 @@ class DetailKaryaPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  // Teks Deskripsi Singkat Karya
-                  const Text.rich(
-                    TextSpan(
-                      text:
-                          "Ubah botol plastik bekas menjadi pot tanaman yang fungsional sekaligus estetik. Selain mengurangi limbah plastik di lingkungan rumah, aktivitas ini juga melatih kreativitas dalam mewarnai dan membentuk karakter pot sesuai keinginan.",
-                      style: TextStyle(
-                        color: Colors.black45,
-                        fontSize: 14,
-                        height: 1.4,
-                      ),
+                  // Deskripsi Meowholder (Sesuai teks gambar mockup)
+                  const Text(
+                    "Meowholder adalah tempat pensil berbahan dasar botol plastik bekas yang dirancangkan menyerupai tubuh kucing. Desainnya unik karena tidak hanya berfungsi sebagai tempat penyimpanan alat tulis, tetapi juga memiliki bentuk yang lucu dan menarik sehingga dapat mempercantik meja belajar.",
+                    style: TextStyle(
+                      color: Colors.black45,
+                      fontSize: 14,
+                      height: 1.4,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-                  // 3. Section Alat dan Bahan (Menggunakan GridView 4 Box Bulat Kotak)
+                  // Section Alat dan Bahan (4 Box Grid sesuai gambar mockup)
                   const Text(
                     "Alat dan Bahan",
                     style: TextStyle(
@@ -162,7 +164,7 @@ class DetailKaryaPage extends StatelessWidget {
                       crossAxisCount: 4,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      childAspectRatio: 1,
+                      childAspectRatio: 0.85, 
                     ),
                     itemBuilder: (context, index) {
                       final item = toolsAndMaterials[index];
@@ -181,12 +183,12 @@ class DetailKaryaPage extends StatelessWidget {
                               color: primaryGreen,
                               size: 24,
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 8),
                             Text(
                               item["label"].toString(),
                               textAlign: TextAlign.center,
                               style: const TextStyle(
-                                fontSize: 13,
+                                fontSize: 12,
                                 color: Colors.black38,
                                 height: 1.2,
                               ),
@@ -196,9 +198,9 @@ class DetailKaryaPage extends StatelessWidget {
                       );
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-                  // 4. Section Video Tutorial
+                  // Section Video Tutorial (Banner Gambar juga disesuaikan)
                   const Text(
                     "Video Tutorial",
                     style: TextStyle(
@@ -217,14 +219,9 @@ class DetailKaryaPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           image: DecorationImage(
-                            image: const NetworkImage(
-                              'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500',
-                            ),
+                            // 4. BIAR SERASI, GAMBAR BANNER VIDEO JUGA BISA PAKAI imageUrl
+                            image: NetworkImage(imageUrl),
                             fit: BoxFit.cover,
-                            colorFilter: ColorFilter.mode(
-                              Colors.black.withOpacity(0.15),
-                              BlendMode.darken,
-                            ),
                           ),
                         ),
                       ),
@@ -255,7 +252,7 @@ class DetailKaryaPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
 
-                  // 5. Section Cara Membuat (Dipisah baris nomornya pakai ListView.builder)
+                  // Section Cara Membuat
                   const Text(
                     "Cara Membuat",
                     style: TextStyle(
@@ -301,45 +298,44 @@ class DetailKaryaPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  // 6. Tombol Aksi Utama Paling Bawah
+                  // Tombol Aksi Utama Paling Bawah
                   SizedBox(
-  width: double.infinity,
-  height: 48,
-  child: ElevatedButton(
-    onPressed: () {
-      // Menambahkan navigasi pindah halaman saat tombol di klik
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const PanduanInteraktifPage(
-            title: 'Pot Tanaman', // Mengirim data title karya
-          ),
-        ),
-      );
-    },
-    style: ElevatedButton.styleFrom(
-      backgroundColor: primaryGreen,
-      foregroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      elevation: 0,
-    ),
-    child: const Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          "Mulai panduan interaktif",
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(width: 6),
-      ],
-    ),
-  ),
-),
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PanduanInteraktifPage(
+                              title: 'Pot Tanaman Kucing',
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryGreen,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Text(
+                            "Mulai panduan interaktif",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
