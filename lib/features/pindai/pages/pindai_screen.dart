@@ -346,17 +346,17 @@ class _PindaiScreenState extends State<PindaiScreen>
                                 children: [
                                   _buildInteractiveGridImage(
                                     bottomSheetContext,
-                                    'https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?w=300',
+                                    'https://tse2.mm.bing.net/th/id/OIP.ldM_LBn8yXEyAQUre6fNEgHaFk?rs=1&pid=ImgDetMain&o=7&rm=3',
                                     140,
                                   ),
                                   _buildInteractiveGridImage(
                                     bottomSheetContext,
-                                    'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=300',
+                                    'https://tse3.mm.bing.net/th/id/OIP.1I5SylKEhBHAWzvS7WrOwQHaFj?w=650&h=488&rs=1&pid=ImgDetMain&o=7&rm=3',
                                     110,
                                   ),
                                   _buildInteractiveGridImage(
                                     bottomSheetContext,
-                                    'https://images.unsplash.com/photo-1544816155-12df9643f363?w=300',
+                                    'https://down-id.img.susercontent.com/file/id-11134207-7qul3-lf6yi5rqn8sd10',
                                     150,
                                   ),
                                 ],
@@ -368,17 +368,17 @@ class _PindaiScreenState extends State<PindaiScreen>
                                 children: [
                                   _buildInteractiveGridImage(
                                     bottomSheetContext,
-                                    'https://images.unsplash.com/photo-1530982011887-3cc11aa8893f?w=300',
+                                    'https://img.lazcdn.com/g/ff/kf/S4c6d550f095c4483a41cdb266ddfb45b5.jpg_720x720q80.jpg',
                                     95,
                                   ),
                                   _buildInteractiveGridImage(
                                     bottomSheetContext,
-                                    'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=300',
+                                    'https://patch.com/img/cdn/users/41476/2012/10/raw/e8a0585a991d35d779f6592b18366260.jpg',
                                     170,
                                   ),
                                   _buildInteractiveGridImage(
                                     bottomSheetContext,
-                                    'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=300',
+                                    'https://cf.shopee.co.id/file/2d8e178d4992e9544634846ec2d894ea',
                                     120,
                                   ),
                                 ],
@@ -689,7 +689,7 @@ class _PindaiScreenState extends State<PindaiScreen>
           if (!mounted) return;
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const DetailKaryaPage()),
+            MaterialPageRoute(builder: (context) => DetailKaryaPage(imageUrl: url)),
           );
         });
       },
