@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:ecoscan/screens/home_screen.dart';
 import 'package:ecoscan/screens/onboarding_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:ecoscan/providers/history_provider.dart';
 
-// 1. Ubah void main() menjadi async
 void main() async {
-  // 2. Wajib tambahkan ini agar inisialisasi kamera & fitur native laptop/HP tidak stuck
   WidgetsFlutterBinding.ensureInitialized();
   
-  runApp(const EcoScanApp());
+  runApp(
+    // Bungkus EcoScanApp dengan MultiProvider
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => HistoryProvider()),
+      ],
+      child: const EcoScanApp(),
+    ),
+  );
 }
 
 class EcoScanApp extends StatelessWidget {

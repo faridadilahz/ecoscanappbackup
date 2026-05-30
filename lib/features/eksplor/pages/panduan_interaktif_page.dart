@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:ecoscan/providers/history_provider.dart';
 
 class PanduanInteraktifPage extends StatefulWidget {
   final String title;
@@ -16,32 +18,38 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
   final List<Map<String, String>> _steps = [
     {
       "title": "Gambar Pola",
-      "desc": "Buat pola pada botol bekas sesuai kreativitasmu, seperti hewan, bunga, atau buah-buahan.",
+      "desc":
+          "Buat pola pada botol bekas sesuai kreativitasmu, seperti hewan, bunga, atau buah-buahan.",
       "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr1.png",
     },
     {
       "title": "Potong Sesuai Pola",
-      "desc": "Gunakan gunting atau cutter untuk memotong botol mengikuti garis pola yang sudah digambar.",
+      "desc":
+          "Gunakan gunting atau cutter untuk memotong botol mengikuti garis pola yang sudah digambar.",
       "image": "lib/features/eksplor/images/undraw_making-art_c05m2.png",
     },
     {
       "title": "Beri Warna Dasar",
-      "desc": "Siapkan cat akrilik lalu warnai seluruh permukaan botol dengan warna dasar, misalnya putih.",
+      "desc":
+          "Siapkan cat akrilik lalu warnai seluruh permukaan botol dengan warna dasar, misalnya putih.",
       "image": "lib/features/eksplor/images/undraw_choose-color_wpfw1.png",
     },
     {
       "title": "Tambahkan Warna",
-      "desc": "Warnai kembali sesuai karakter atau desain yang telah kamu buat sebelumnya.",
+      "desc":
+          "Warnai kembali sesuai karakter atau desain yang telah kamu buat sebelumnya.",
       "image": "lib/features/eksplor/images/undraw_add-color_62111.png",
     },
     {
       "title": "Keringkan Cat",
-      "desc": "Diamkan sebentar hingga cat benar-benar kering agar cat tidak luntur.",
+      "desc":
+          "Diamkan sebentar hingga cat benar-benar kering agar cat tidak luntur.",
       "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn1.png",
     },
     {
       "title": "Pot Siap Digunakan",
-      "desc": "Botol bekas kini siap dijadikan pot bunga yang cantik dan bermanfaat.",
+      "desc":
+          "Botol bekas kini siap dijadikan pot bunga yang cantik dan bermanfaat.",
       "image": "lib/features/eksplor/images/scissors1.png",
     },
   ];
@@ -244,7 +252,7 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
             ],
           ),
           const SizedBox(height: 20),
-          
+
           // Indikator Bulat Smooth Gliding
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -321,11 +329,7 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
           const Text(
             "Kamu telah mengolah botol plastik hari ini. Aksimu ini membantu mengurangi sampah dan menjaga keseimbangan lingkungan.",
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.black45,
-              fontSize: 15,
-              height: 1.5,
-            ),
+            style: TextStyle(color: Colors.black45, fontSize: 15, height: 1.5),
           ),
           const SizedBox(height: 40),
           // Tombol Selesai
@@ -333,7 +337,11 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                context.read<HistoryProvider>().createBarang(widget.title);
+
+                Navigator.pop(context);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF17AC64),
                 foregroundColor: Colors.white,

@@ -3,9 +3,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:provider/provider.dart';
+import 'package:ecoscan/providers/history_provider.dart';
 import 'pengepul_screen.dart';
-import 'detail_karya_screen.dart'; // Sesuaikan jika nama aslinya detail_karya_page.dart
+import 'detail_karya_screen.dart';
 
 class PindaiScreen extends StatefulWidget {
   final Function(int) onTapMenu; // Terima fungsi navigasi dari HomeScreen
@@ -170,6 +171,7 @@ class _PindaiScreenState extends State<PindaiScreen>
           _showHasil = true;
         });
         _animationController.stop();
+        context.read<HistoryProvider>().addScan('Botol Air Mineral');
         _showHasilBottomSheet();
       } else {
         if (mounted) {

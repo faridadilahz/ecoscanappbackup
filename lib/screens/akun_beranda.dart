@@ -1,66 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:ecoscan/providers/history_provider.dart';
 
 class AkunBeranda extends StatelessWidget {
   const AkunBeranda({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final history = context.watch<HistoryProvider>();
     return Scaffold(
       backgroundColor: const Color(0xFFF9FBF9),
       appBar: PreferredSize(
-  preferredSize: const Size.fromHeight(86),
-  child: AppBar(
-    backgroundColor: const Color(0xFF17AC64),
-    elevation: 0,
-    automaticallyImplyLeading: false,
-    flexibleSpace: SafeArea(
-      child: Padding(
-        // Atur padding biar posisinya pas di tengah header yang baru
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), 
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: const CircleAvatar(
-                backgroundColor: Colors.white,
-                radius: 20,
-                child: Icon(Icons.arrow_back, color: Color(0xFF17AC64), size: 20),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 12,
-                      backgroundColor: Color(0xFFE57373),
-                      child: Text('S', style: TextStyle(color: Colors.white, fontSize: 10)),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Eco #Supernova2112',
-                      style: TextStyle(
-                        color: Colors.grey[800],
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+        preferredSize: const Size.fromHeight(86),
+        child: AppBar(
+          backgroundColor: const Color(0xFF17AC64),
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          flexibleSpace: SafeArea(
+            child: Padding(
+              // Atur padding biar posisinya pas di tengah header yang baru
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 20,
+                      child: Icon(
+                        Icons.arrow_back,
+                        color: Color(0xFF17AC64),
+                        size: 20,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const CircleAvatar(
+                            radius: 12,
+                            backgroundColor: Color(0xFFE57373),
+                            child: Text(
+                              'S',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Eco #Supernova2112',
+                            style: TextStyle(
+                              color: Colors.grey[800],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
-    ),
-  ),
-),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,14 +98,16 @@ class AkunBeranda extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 children: [
+                  // Mengambil jumlah scan dan nama barang terakhir dari provider
                   _buildStatCard(
-                    "8 barang dipindai",
-                    "Botol plastik, Sterofoam, Sa...",
+                    "${history.jumlahScan} barang dipindai",
+                    history.lastScan,
                   ),
                   const SizedBox(width: 12),
+                  // Mengambil jumlah ide yang dilihat dari provider
                   _buildStatCard(
-                    "12 ide dilihat",
-                    "Pot tanaman, Isian bantal, H...",
+                    "${history.jumlahIde} ide dilihat",
+                    history.lastIde,
                   ),
                 ],
               ),
@@ -99,7 +117,7 @@ class AkunBeranda extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: _buildStatCard(
                 "Terakhir dibuat",
-                "Pot tanaman botol plastik, Tempat pensil botol plastik, Rak kec...",
+                history.lastMade, // Data real barang yang terakhir dibuat
                 isFullWidth: true,
               ),
             ),

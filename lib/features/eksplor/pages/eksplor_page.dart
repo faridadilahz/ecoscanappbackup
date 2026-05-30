@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'eksplor_detail_page.dart';
 import 'package:ecoscan/features/pindai/pages/pindai_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:ecoscan/providers/history_provider.dart';
 
 class DaurUlangModel {
   final String title;
@@ -294,15 +296,20 @@ class _EksplorPageState extends State<EksplorPage> {
   }
 
   Widget _buildIdeaGridCard(DaurUlangModel idea) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => EksplorDetailPage(idea: idea),
-          ),
-        );
-      },
+  return GestureDetector(
+    onTap: () {
+      // 1. Simpan ke riwayat (Provider)
+      // Pake context.read karena ini di dalam fungsi klik (onTap)
+      context.read<HistoryProvider>().viewIde(idea.title); 
+
+      // 2. Baru pindah halaman
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EksplorDetailPage(idea: idea),
+        ),
+      );
+    },
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
