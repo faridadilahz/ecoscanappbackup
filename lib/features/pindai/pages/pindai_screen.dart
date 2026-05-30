@@ -296,9 +296,6 @@ class _PindaiScreenState extends State<PindaiScreen>
                                 const SizedBox(height: 4),
                                 GestureDetector(
                                   onTap: () {
-                                    // Tutup bottom sheet terlebih dahulu agar tidak ikut terbawa
-                                    Navigator.pop(bottomSheetContext);
-                                    
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
