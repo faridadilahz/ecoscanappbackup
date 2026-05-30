@@ -61,6 +61,17 @@ class _PindaiScreenState extends State<PindaiScreen>
       });
       _animationController.stop();
     }
+    if (widget.isActive != oldWidget.isActive) {
+      if (widget.isActive) {
+        _initLaptopCamera();
+      } else {
+        _cameraController?.dispose();
+        _cameraController = null;
+        setState(() {
+          _isCameraInitialized = false;
+        });
+      }
+    }
   }
 
   void _initLaserAnimation() {
@@ -76,6 +87,15 @@ class _PindaiScreenState extends State<PindaiScreen>
   }
 
   Future<void> _initLaptopCamera() async {
+    if (_cameraController != null) {
+      await _cameraController!.dispose();
+      _cameraController = null;
+      if (mounted) {
+        setState(() {
+          _isCameraInitialized = false;
+        });
+      }
+    }
     try {
       _cameras = await availableCameras();
       if (_cameras != null && _cameras!.isNotEmpty) {
@@ -160,7 +180,7 @@ class _PindaiScreenState extends State<PindaiScreen>
     });
     _animationController.forward();
 
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 8), () {
       if (mounted &&
           widget.isActive &&
           _isScanning &&
@@ -192,6 +212,7 @@ class _PindaiScreenState extends State<PindaiScreen>
       _isScanning = false;
     });
     _animationController.stop();
+    _initLaptopCamera();
   }
 
   void _showHasilBottomSheet() {
@@ -467,11 +488,7 @@ class _PindaiScreenState extends State<PindaiScreen>
                           child: IconButton(
                             icon: const Icon(Icons.arrow_back, color: Colors.white),
                             onPressed: () {
-                              setState(() {
-                                _galleryImage = null;
-                                _isScanning = false;
-                              });
-                              _animationController.stop();
+                              _resetPindaiPage();
                             },
                           ),
                         )
@@ -506,31 +523,41 @@ class _PindaiScreenState extends State<PindaiScreen>
 
           // 4. ANIMASI LASER SCANNER
           if (_isScanning)
-            AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) {
-                return Positioned(
-                  top: (MediaQuery.of(context).size.height * 0.5 -
-                          (boxHeight / 2)) +
-                      (_animationController.value * boxHeight),
-                  left:
-                      MediaQuery.of(context).size.width * 0.5 - (boxWidth / 2),
+            Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(32),
+                child: SizedBox(
                   width: boxWidth,
-                  child: Container(
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: primaryGreen,
-                      boxShadow: [
-                        BoxShadow(
-                          color: primaryGreen.withOpacity(0.6),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
+                  height: boxHeight,
+                  child: Stack(
+                    children: [
+                      AnimatedBuilder(
+                        animation: _animationController,
+                        builder: (context, child) {
+                          return Positioned(
+                            top: _animationController.value * (boxHeight - 4),
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: primaryGreen,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: primaryGreen.withOpacity(0.6),
+                                    blurRadius: 10,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                );
-              },
+                ),
+              ),
             ),
 
           // 5. STATUS PILL SCANNING
@@ -683,17 +710,11 @@ class _PindaiScreenState extends State<PindaiScreen>
   ) {
     return GestureDetector(
       onTap: () {
-        // 1. Tutup bottom sheet terlebih dahulu menggunakan bSheetContext
-        Navigator.pop(bSheetContext);
-
-        // 2. Transisi membuka halaman detail karya
-        Future.delayed(const Duration(milliseconds: 150), () {
-          if (!mounted) return;
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => DetailKaryaPage(imageUrl: url)),
-          );
-        });
+        // Pindahkan langsung ke halaman detail karya tanpa menutup bottom sheet
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DetailKaryaPage(imageUrl: url)),
+        );
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
