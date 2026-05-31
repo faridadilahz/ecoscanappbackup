@@ -140,7 +140,140 @@ class AkunBeranda extends StatelessWidget {
               title: "Kebijakan Privasi",
               icon: Icons.chevron_right,
             ),
-            _buildMenuTile(title: "Set Ulang Data", isWarning: true),
+            _buildMenuTile(
+              title: "Set Ulang Data",
+              isWarning: true,
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => Dialog(
+                    // Kita pake Dialog biar lebih bebas custom bentuknya
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize
+                            .min, // Biar tinggi dialog ngikutin konten
+                        children: [
+                          // Icon Peringatan yang Menonjol
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade50,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.delete_forever_rounded,
+                              color: Colors.redAccent,
+                              size: 40,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Judul
+                          const Text(
+                            "Yakin ingin Set Ulang Data?",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            "Semua riwayat pindai, ide yang dilihat, dan progres karya akan dihapus.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Tombol Aksi Row
+                          Row(
+                            children: [
+                              // Tombol Batal
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    side: BorderSide(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Batal",
+                                    style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+
+                              // Tombol Hapus (Confirm)
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    context
+                                        .read<HistoryProvider>()
+                                        .resetHistory();
+                                    Navigator.pop(context);
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text(
+                                          "Data berhasil direset",
+                                        ),
+                                        backgroundColor: Colors.black87,
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.redAccent,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Ya, Hapus",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
 
             const SizedBox(height: 40),
           ],
@@ -186,6 +319,7 @@ class AkunBeranda extends StatelessWidget {
     required String title,
     IconData? icon,
     bool isWarning = false,
+    VoidCallback? onTap,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
@@ -203,9 +337,7 @@ class AkunBeranda extends StatelessWidget {
           ),
         ),
         trailing: icon != null ? Icon(icon, color: Colors.grey) : null,
-        onTap: () {
-          // Aksi menu di sini
-        },
+        onTap: onTap,
       ),
     );
   }

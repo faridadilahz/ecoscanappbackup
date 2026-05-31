@@ -34,4 +34,15 @@ class HistoryProvider extends ChangeNotifier {
     _lastMade = namaBarang;
     notifyListeners();
   }
+
+  // Di dalam class HistoryProvider
+void resetHistory() {
+  _jumlahScan = 0;
+  _jumlahIde = 0;
+  _lastScan = "Belum ada scan";
+  _lastIde = "Belum ada ide dilihat";
+  _lastMade = "Belum ada barang dibuat";
+  
+  notifyListeners();
+}
 }

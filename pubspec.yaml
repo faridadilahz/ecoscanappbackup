@@ -72,7 +72,7 @@ flutter:
   fonts:
     - family: Bricolage-Grotesque
       fonts:
-        - asset: assets/fonts/BricolageGrotesque-VariableFont_opsz,wdth,wght.ttf
+        - asset: assets/fonts/BricolageGrotesque.ttf
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:
