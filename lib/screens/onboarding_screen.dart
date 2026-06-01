@@ -1,7 +1,6 @@
 import 'package:ecoscan/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
-//Class Onboarding
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -32,7 +31,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
 
   void _goToHome() {
-    // Navigator.pushReplacement biar user ga bisa klik 'back' ke onboarding lagi
+    // Langsung loncat ke beranda, terus kalo back di beranda ga kepental ke onboarding
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -46,7 +45,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // --- HEADER ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Row(
@@ -75,7 +73,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
 
-            // --- SLIDER ---
+            // Slider bawah
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -94,7 +92,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Expanded(
                           child: Image.asset(
                             _onboardingData[index]["image"]!,
-                            fit: BoxFit.contain, // SUDAH FIX (Bukan BoxImageBreak)
+                            fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) {
                               return const Icon(Icons.image_not_supported, size: 100, color: Colors.grey);
                             },
@@ -126,7 +124,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
 
-            // --- FOOTER ---
+            // Footer onboarding (Elemen Slider)
             Padding(
               padding: const EdgeInsets.all(30.0),
               child: Column(

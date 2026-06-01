@@ -8,7 +8,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   runApp(
-    // Bungkus EcoScanApp dengan MultiProvider
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => HistoryProvider()),
@@ -25,14 +24,13 @@ class EcoScanApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'EcoScan',
-      debugShowCheckedModeBanner: false, // Ngilangin banner "debug" di pojok kanan
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green), // Style Material 3 yang direkomendasikan
-        // Kita set font family default ke Sans Serif agar mirip desain Figma lo
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         fontFamily: 'Bricolage-Grotesque', 
-        useMaterial3: true, // Pake style Material 3 yang lebih modern
+        useMaterial3: true,
       ),
-      home: const OnboardingScreen(), // Arahkan ke class yang ada di home_screen.dart
+      home: const OnboardingScreen(),
     );
   }
 }

@@ -12,12 +12,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  int _previousIndex = 0; // Merujuk ke halaman terakhir sebelum pindah ke Pindai
+  int _previousIndex = 0;
 
   // Fungsi navigasi utama
   void _changePage(int index) {
     setState(() {
-      // Jika user mau pindah ke Pindai (index 1), catat halaman saat ini sebagai halaman terakhir
       if (index == 1) {
         _previousIndex = _currentIndex;
       }
@@ -27,13 +26,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // List halaman yang disatukan (Sudah diperbaiki dari duplikasi)
     final List<Widget> _pages = [
       BerandaContent(onTapMenu: _changePage),
       PindaiScreen(
         onTapMenu: _changePage,
-        previousIndex: _previousIndex, // Kirim data halaman terakhir ke PindaiScreen
-        currentIndex: _currentIndex,   // Mengirim indeks aktif saat ini
+        previousIndex: _previousIndex,
+        currentIndex: _currentIndex,
         isActive: _currentIndex == 1,
       ),
       EksplorPage(onTapMenu: _changePage),
@@ -67,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// --- KONTEN BERANDA ---
+// Konten Beranda
 class BerandaContent extends StatelessWidget {
   final Function(int) onTapMenu;
   const BerandaContent({super.key, required this.onTapMenu});
@@ -135,7 +133,7 @@ class BerandaContent extends StatelessWidget {
                   ),
                   const SizedBox(height: 172),
 
-                  // CTA 1: PINDAI
+                  // CTA 1 ke Pindai
                   InkWell(
                     onTap: () => onTapMenu(1),
                     borderRadius: BorderRadius.circular(24),
@@ -150,7 +148,7 @@ class BerandaContent extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // CTA 2: EKSPLOR
+                  // CTA 2 ke Eksplor
                   InkWell(
                     onTap: () => onTapMenu(2),
                     borderRadius: BorderRadius.circular(24),

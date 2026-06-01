@@ -18,7 +18,6 @@ class AkunBeranda extends StatelessWidget {
           automaticallyImplyLeading: false,
           flexibleSpace: SafeArea(
             child: Padding(
-              // Atur padding biar posisinya pas di tengah header yang baru
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Row(
                 children: [
@@ -93,18 +92,15 @@ class AkunBeranda extends StatelessWidget {
               ),
             ),
 
-            // Stats Row
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 children: [
-                  // Mengambil jumlah scan dan nama barang terakhir dari provider
                   _buildStatCard(
                     "${history.jumlahScan} barang dipindai",
                     history.lastScan,
                   ),
                   const SizedBox(width: 12),
-                  // Mengambil jumlah ide yang dilihat dari provider
                   _buildStatCard(
                     "${history.jumlahIde} ide dilihat",
                     history.lastIde,
@@ -117,7 +113,7 @@ class AkunBeranda extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: _buildStatCard(
                 "Terakhir dibuat",
-                history.lastMade, // Data real barang yang terakhir dibuat
+                history.lastMade,
                 isFullWidth: true,
               ),
             ),
@@ -134,7 +130,7 @@ class AkunBeranda extends StatelessWidget {
               ),
             ),
 
-            // Menu Options
+            // Opsi Pengaturan
             _buildMenuTile(title: "Tentang EcoScan", icon: Icons.chevron_right),
             _buildMenuTile(
               title: "Kebijakan Privasi",
@@ -147,7 +143,7 @@ class AkunBeranda extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (context) => Dialog(
-                    // Kita pake Dialog biar lebih bebas custom bentuknya
+                    // Dialog logout
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -155,9 +151,8 @@ class AkunBeranda extends StatelessWidget {
                       padding: const EdgeInsets.all(24),
                       child: Column(
                         mainAxisSize: MainAxisSize
-                            .min, // Biar tinggi dialog ngikutin konten
+                            .min,
                         children: [
-                          // Icon Peringatan yang Menonjol
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
@@ -172,7 +167,7 @@ class AkunBeranda extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
 
-                          // Judul
+                          // Judul Dialog
                           const Text(
                             "Yakin ingin Set Ulang Data?",
                             style: TextStyle(
@@ -182,6 +177,7 @@ class AkunBeranda extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
+                          // Deskripsi Dialog
                           const Text(
                             "Semua riwayat pindai, ide yang dilihat, dan progres karya akan dihapus.",
                             textAlign: TextAlign.center,
@@ -193,10 +189,10 @@ class AkunBeranda extends StatelessWidget {
                           ),
                           const SizedBox(height: 32),
 
-                          // Tombol Aksi Row
+                          // Tombol Aksi Dialog
                           Row(
                             children: [
-                              // Tombol Batal
+                              // Tombol Batal Dialog
                               Expanded(
                                 child: OutlinedButton(
                                   onPressed: () => Navigator.pop(context),
@@ -222,7 +218,7 @@ class AkunBeranda extends StatelessWidget {
                               ),
                               const SizedBox(width: 12),
 
-                              // Tombol Hapus (Confirm)
+                              // Tombol Ya, Hapus Dialog
                               Expanded(
                                 child: ElevatedButton(
                                   onPressed: () {
@@ -282,7 +278,7 @@ class AkunBeranda extends StatelessWidget {
     );
   }
 
-  // Widget Helper buat Kartu Statistik
+  // Widget buat card statistik akun
   Widget _buildStatCard(String title, String desc, {bool isFullWidth = false}) {
     Widget content = Container(
       padding: const EdgeInsets.all(16),
@@ -314,7 +310,7 @@ class AkunBeranda extends StatelessWidget {
         : Expanded(child: content);
   }
 
-  // Widget Helper buat List Menu
+  // Widget buat list menu
   Widget _buildMenuTile({
     required String title,
     IconData? icon,
