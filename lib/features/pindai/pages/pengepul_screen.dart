@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart'; 
 import 'package:latlong2/latlong.dart';
-import 'package:ecoscan/features/eksplor/pages/eksplor_page.dart';
-import 'package:ecoscan/screens/home_screen.dart'; 
+import 'package:ecoscan/widgets/cors_image.dart';
 
 // Model Data Pengepul & Bank Sampah
 class PengepulData {
@@ -11,7 +10,7 @@ class PengepulData {
   final String wilayah;
   final LatLng koordinat;
   final List<String> kategori;
-  final List<String> galeri;
+  final List<String> galeri; 
 
   PengepulData({
     required this.nama,
@@ -37,7 +36,9 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
   final LatLng _kotaBogor = const LatLng(-6.5971, 106.8060);
   final Color primaryGreen = const Color(0xFF27AE60);
 
-  // Data asli Bank Sampah & Pengepul
+  // =========================================================================
+  // DATA SUMBER DENGAN LINK YANG SUDAH DIPERBAIKI (DIUBAH KE HTTPS AMAN)
+  // =========================================================================
   final List<PengepulData> _daftarPengepulAsli = [
     PengepulData(
       nama: "BANK SAMPAH RANGGA MEKAR &\nRUMAH KREATIF NUSANTARA",
@@ -46,9 +47,8 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
       koordinat: const LatLng(-6.6215, 106.7992), 
       kategori: ["Plastik", "Botol", "Kertas", "Kardus"],
       galeri: [
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.6215,106.7992&fov=90&heading=0&pitch=10",
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.6215,106.7992&fov=90&heading=120&pitch=10",
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.6215,106.7992&fov=90&heading=240&pitch=10",
+        "https://asset.tribunnews.com/N-lcDFhqBjOke7_5m5d5Rh-2F3k=/1200x675/filters:upscale():quality(30):format(webp):focal(0.5x0.5:0.5x0.5)/bogor/foto/bank/originals/Program-Bank-Sampah-Rangga-Mekar.jpg",
+        "https://bogorchannel.id/wp-content/uploads/2023/02/IMG-20230223-WA0020.jpg",
       ],
     ),
     PengepulData(
@@ -58,10 +58,9 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
       koordinat: const LatLng(-6.6085, 106.7975),
       kategori: ["Besi", "Plastik", "Tembaga", "Kertas"],
       galeri: [
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.6085,106.7975&fov=90&heading=0&pitch=10",
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.6085,106.7975&fov=90&heading=120&pitch=10",
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.6085,106.7975&fov=90&heading=240&pitch=10",
-      ],
+        "https://jurnalbogor.com/wp-content/uploads/2025/01/WhatsApp-Image-2025-01-07-at-18.06.25.jpeg",
+        "https://jurnalbogor.com/wp-content/uploads/2025/06/IMG-20250622-WA0010.jpg"
+      ], 
     ),
     PengepulData(
       nama: "BANK SAMPAH BARANANGSIANG",
@@ -70,21 +69,17 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
       koordinat: const LatLng(-6.6042, 106.8124),
       kategori: ["Plastik", "Kaca", "Koran", "Kardus"],
       galeri: [
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.6042,106.8124&fov=90&heading=0&pitch=10",
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.6042,106.8124&fov=90&heading=120&pitch=10",
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.6042,106.8124&fov=90&heading=240&pitch=10",
+        "https://i0.wp.com/bharatanews.id/wp-content/uploads/2022/05/IMG-20220530-WA0034.jpg",
       ],
     ),
     PengepulData(
       nama: "BANK SAMPAH INDUK BERKAH",
       status: "Buka",
       wilayah: "Tanah Sareal, Kota Bogor",
-      koordinat: const LatLng(-6.5652, 106.7912),
+      koordinat: const LatLng(-6.5652, 106.7992),
       kategori: ["Elektronik", "Plastik", "Besi", "Botol"],
       galeri: [
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.5652,106.7912&fov=90&heading=0&pitch=10",
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.5652,106.7912&fov=90&heading=120&pitch=10",
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.5652,106.7912&fov=90&heading=240&pitch=10",
+        "assets/images/bsi.png",
       ],
     ),
     PengepulData(
@@ -94,9 +89,7 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
       koordinat: const LatLng(-6.6321, 106.8295),
       kategori: ["Plastik", "Minyak Jelantah", "Kertas"],
       galeri: [
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.6321,106.8295&fov=90&heading=0&pitch=10",
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.6321,106.8295&fov=90&heading=120&pitch=10",
-        "https://maps.googleapis.com/maps/api/streetview?size=400x300&location=-6.6321,106.8295&fov=90&heading=240&pitch=10",
+        "https://www.radarbogor.id/files/2020/12/Desa-Tajur-Halang.jpg",
       ],
     ),
   ];
@@ -283,9 +276,7 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
 
           // 2. HEADER GREEN SOLID
           Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
+            top: 0, left: 0, right: 0,
             child: Container(
               color: primaryGreen,
               padding: EdgeInsets.only(
@@ -308,11 +299,10 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
             ),
           ),
 
-          // 3. SEARCH BAR + GOOGLE-LIKE AUTOCOMPLETE SUGGESTIONS
+          // 3. SEARCH BAR
           Positioned(
             top: MediaQuery.of(context).padding.top + 80,
-            left: 20,
-            right: 20,
+            left: 20, right: 20,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -402,7 +392,7 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
               ),
             ),
 
-          // 5. DRAGGABLE BOTTOM SHEET PANEL (Fleksibel: List / Detail)
+          // 5. DRAGGABLE BOTTOM SHEET PANEL
           if (_hasSearched && !_showSuggestions && _filteredPengepul.isNotEmpty)
             Positioned.fill(
               child: DraggableScrollableSheet(
@@ -510,31 +500,39 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
                             ),
                           ),
                           
-                          // BAGIAN GALERI YANG SUDAH DIREPARASI (GAP DEKET-DEKETAN)
+                          // ==========================================================
+                          // SEKSI GALERI HORIZONTAL BERIKUT PERBAIKAN LOADING & ERROR
+                          // ==========================================================
                           if (_selectedPengepul!.galeri.isNotEmpty) ...[
                             const SizedBox(height: 16),
-                            const Text("Galeri & Ulasan Google Maps", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                            const Text("Galeri", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                             const SizedBox(height: 8),
                             SizedBox(
-                              height: 90, 
-                              child: SingleChildScrollView(
+                              height: 100, 
+                              child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: _selectedPengepul!.galeri.map((imageUrl) {
-                                    return Container(
-                                      width: 120,
-                                      height: 90,
-                                      margin: const EdgeInsets.only(right: 4), // Jarak antar gambar tipis (4px)
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        image: DecorationImage(
-                                          image: NetworkImage(imageUrl),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
+                                itemCount: _selectedPengepul!.galeri.length,
+                                itemBuilder: (context, index) {
+                                  final imgPath = _selectedPengepul!.galeri[index];
+                                  final isNetwork = imgPath.startsWith('http://') || imgPath.startsWith('https://');
+
+                                  return Container(
+                                    width: 110, 
+                                    margin: const EdgeInsets.only(right: 6), 
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8), 
+                                      child: isNetwork
+                                          ? createCorsImage(
+                                              imgPath,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.asset(
+                                              imgPath,
+                                              fit: BoxFit.cover,
+                                            ),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ],
@@ -598,21 +596,7 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1, 
         onTap: (index) {
-          if (index == 0) {
-            final homeState = context.findAncestorStateOfType<State<HomeScreen>>();
-            if (homeState != null) {
-              (homeState as dynamic)._changePage(0);
-            }
-            Navigator.pop(context);
-          } else if (index == 1) {
-            Navigator.pop(context);
-          } else if (index == 2) {
-            final homeState = context.findAncestorStateOfType<State<HomeScreen>>();
-            if (homeState != null) {
-              (homeState as dynamic)._changePage(2);
-            }
-            Navigator.pop(context); 
-          }
+          Navigator.pop(context);
         },
         selectedItemColor: const Color(0xFF17AC64),
         unselectedItemColor: Colors.grey,
