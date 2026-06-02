@@ -62,6 +62,34 @@ class DaurUlangModel {
       timeEstimate: "30-40 menit",
       imageUrl: "https://cf.shopee.co.id/file/2d8e178d4992e9544634846ec2d894ea",
     ),
+    DaurUlangModel(
+      title: "Tempat Pensil Meja",
+      category: "Botol",
+      difficulty: "Sangat Mudah",
+      timeEstimate: "5-10 menit",
+      imageUrl: "https://thf.bing.com/th/id/OIP.ViIB7pam_Se5sNcdpGg0VgHaEK?w=329&h=185&c=7&r=0&o=7&cb=thfc1falcon&dpr=1.3&pid=1.7&rm=3",
+    ),
+    DaurUlangModel(
+      title: "Rak Buku Kardus",
+      category: "Kardus",
+      difficulty: "Susah",
+      timeEstimate: "40-50 menit",
+      imageUrl: "https://thf.bing.com/th/id/OIP.0jL4G4yInhOqYgIlLZuT3QHaHa?w=181&h=181&c=7&r=0&o=7&cb=thfc1falcon&dpr=1.3&pid=1.7&rm=3",
+    ),
+    DaurUlangModel(
+      title: "Tas Belanja Eco",
+      category: "Plastik",
+      difficulty: "Sedang",
+      timeEstimate: "25-35 menit",
+      imageUrl: "https://thf.bing.com/th/id/OIP.YYx7dgpiG52Ht_2OHJeEGgHaHa?w=196&h=196&c=7&r=0&o=7&cb=thfc1falcon&dpr=1.3&pid=1.7&rm=3",
+    ),
+    DaurUlangModel(
+      title: "Pembatas Buku Unik",
+      category: "Kertas",
+      difficulty: "Mudah",
+      timeEstimate: "10-15 menit",
+      imageUrl: "https://thf.bing.com/th/id/OIP.zwZeULgeOpAdqVDqKyGXGAHaEj?w=299&h=184&c=7&r=0&o=7&cb=thfc1falcon&dpr=1.3&pid=1.7&rm=3",
+    ),
   ];
 }
 
