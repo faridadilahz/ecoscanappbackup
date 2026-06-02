@@ -13,14 +13,23 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   int _previousIndex = 0;
+  bool _isFromScanButtonToPindai = false;
 
-  // Fungsi navigasi utama
   void _changePage(int index) {
     setState(() {
       if (index == 1) {
         _previousIndex = _currentIndex;
       }
       _currentIndex = index;
+      _isFromScanButtonToPindai = false;
+    });
+  }
+
+  void _goToPindaiFromScanButton() {
+    setState(() {
+      _isFromScanButtonToPindai = true;
+      _previousIndex = 2;
+      _currentIndex = 1;
     });
   }
 
@@ -33,31 +42,147 @@ class _HomeScreenState extends State<HomeScreen> {
         previousIndex: _previousIndex,
         currentIndex: _currentIndex,
         isActive: _currentIndex == 1,
+        isFromScanButton: _isFromScanButtonToPindai,
       ),
-      EksplorPage(onTapMenu: _changePage),
+      EksplorPage(
+        onTapMenu: _changePage,
+        onTapScanButton: _goToPindaiFromScanButton,
+      ),
     ];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FBF9),
       body: IndexedStack(index: _currentIndex, children: _pages),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _changePage,
-        selectedItemColor: const Color(0xFF17AC64),
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
-            label: "Beranda",
+      
+      bottomNavigationBar: Stack(
+        alignment: Alignment.topCenter,
+        clipBehavior: Clip.none,
+        children: [
+          // 1. BACKGROUND NAVBAR DENGAN LEKUKAN KUSTOM
+          BottomAppBar(
+            shape: const CircularNotchedRectangle(),
+            notchMargin: 6.0,
+            color: Colors.white,
+            clipBehavior: Clip.antiAlias,
+            elevation: 10,
+            child: SizedBox(
+              height: 60,
+              child: Row(
+                children: [
+                  // === MENU BERANDA (HITBOX DIKECILKAN) ===
+                  Expanded(
+                    child: Center( // Menjaga isi tetap di tengah struktur Grid
+                      child: InkWell(
+                        onTap: () => _changePage(0),
+                        borderRadius: BorderRadius.circular(12), // Efek splash membulat rapi seukuran teks
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0), // Hitbox kustom yang pas
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.home_filled,
+                                color: _currentIndex == 0 ? const Color(0xFF17AC64) : Colors.grey,
+                                size: 26,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Beranda",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: _currentIndex == 0 ? FontWeight.bold : FontWeight.normal,
+                                  color: _currentIndex == 0 ? const Color(0xFF17AC64) : Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // SPACE UTK MELETAKKAN TOMBOL PINDAI DI TENGAH (Lebar ditambah dikit agar aman dari jari)
+                  const SizedBox(width: 76),
+
+                  // === MENU EKSPLOR (HITBOX DIKECILKAN) ===
+                  Expanded(
+                    child: Center( // Menjaga isi tetap di tengah struktur Grid
+                      child: InkWell(
+                        onTap: () => _changePage(2),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0), // Hitbox kustom yang pas
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.search,
+                                color: _currentIndex == 2 ? const Color(0xFF17AC64) : Colors.grey,
+                                size: 26,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Eksplor",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: _currentIndex == 2 ? FontWeight.bold : FontWeight.normal,
+                                  color: _currentIndex == 2 ? const Color(0xFF17AC64) : Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.qr_code_scanner_rounded),
-            label: "Pindai",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search), 
-            label: "Eksplor",
+
+          // 2. TOMBOL PINDAI KOTAK + TEKS DI BAWAHNYA
+          Positioned(
+            top: -24,
+            child: GestureDetector(
+              onTap: () => _changePage(1),
+              behavior: HitTestBehavior.opaque, // Memastikan area klik FAB sensitif dan akurat
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 58,
+                    height: 58,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF17AC64),
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.qr_code_scanner_rounded,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    "Pindai",
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: _currentIndex == 1 ? FontWeight.bold : FontWeight.normal,
+                      color: _currentIndex == 1 ? const Color(0xFF17AC64) : Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -65,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// Konten Beranda
+// Konten Beranda (Tetap sama seperti kode Anda)
 class BerandaContent extends StatelessWidget {
   final Function(int) onTapMenu;
   const BerandaContent({super.key, required this.onTapMenu});
@@ -133,7 +258,6 @@ class BerandaContent extends StatelessWidget {
                   ),
                   const SizedBox(height: 172),
 
-                  // CTA 1 ke Pindai
                   InkWell(
                     onTap: () => onTapMenu(1),
                     borderRadius: BorderRadius.circular(24),
@@ -148,7 +272,6 @@ class BerandaContent extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // CTA 2 ke Eksplor
                   InkWell(
                     onTap: () => onTapMenu(2),
                     borderRadius: BorderRadius.circular(24),

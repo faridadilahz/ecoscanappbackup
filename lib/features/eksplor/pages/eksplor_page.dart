@@ -22,8 +22,13 @@ class DaurUlangModel {
 
 class EksplorPage extends StatefulWidget {
   final Function(int) onTapMenu; // <-- 1. INI DIUBAH: nerima fungsi pindah indeks tab
+  final VoidCallback onTapScanButton;
   
-  const EksplorPage({super.key, required this.onTapMenu}); // <-- 2. INI JUGA DIUBAH: jadi required
+  const EksplorPage({
+    super.key, 
+    required this.onTapMenu,
+    required this.onTapScanButton, // Tambahkan ini
+    }); // <-- 2. INI JUGA DIUBAH: jadi required
 
   @override
   State<EksplorPage> createState() => _EksplorPageState();
@@ -130,7 +135,7 @@ class _EksplorPageState extends State<EksplorPage> {
                       icon: const Icon(Icons.qr_code_scanner_rounded, color: Color(0xFF17AC64), size: 28), 
                       onPressed: () {
                         // <-- 3. INI DIUBAH: panggil fungsi bawaan navbar buat pindah ke tab indeks 1 (Pindai)
-                        widget.onTapMenu(1); 
+                        widget.onTapScanButton(); 
                       },
                       constraints: const BoxConstraints(),
                       padding: EdgeInsets.zero,

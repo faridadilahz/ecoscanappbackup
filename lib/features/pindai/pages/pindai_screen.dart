@@ -13,6 +13,7 @@ class PindaiScreen extends StatefulWidget {
   final int previousIndex; // Terima index halaman terakhir
   final int currentIndex;
   final bool isActive;
+  final bool isFromScanButton; // Tambahkan parameter baru ini
 
   const PindaiScreen({
     super.key,
@@ -20,6 +21,7 @@ class PindaiScreen extends StatefulWidget {
     required this.previousIndex,
     required this.currentIndex,
     required this.isActive,
+    this.isFromScanButton = false, // Set default ke false agar navbar tidak terpengaruh
   });
 
   @override
@@ -483,8 +485,7 @@ class _PindaiScreenState extends State<PindaiScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
-                  // --- TOMBOL TENGAH (BACK JIKA PILIH GAMBAR) ---
+                  // --- TOMBOL KIRI (BACK KHUSUS) ---
                   _isScanning || _galleryImage != null
                       ? CircleAvatar(
                           backgroundColor: Colors.black45,
@@ -495,7 +496,18 @@ class _PindaiScreenState extends State<PindaiScreen>
                             },
                           ),
                         )
-                      : const SizedBox(width: 40, height: 40),
+                      : widget.isFromScanButton // SEKARANG BERPATOKAN PADA FLAG INI
+                          ? CircleAvatar(
+                              backgroundColor: Colors.black45,
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                                onPressed: () {
+                                  // Kembalikan ke Eksplor (Index 2)
+                                  widget.onTapMenu(2);
+                                },
+                              ),
+                            )
+                          : const SizedBox(width: 40, height: 40), // Sembunyi jika lewat navbar bawah
 
                   // --- TOMBOL KANAN (FLASH) ---
                   CircleAvatar(
@@ -503,7 +515,7 @@ class _PindaiScreenState extends State<PindaiScreen>
                     child: IconButton(
                       icon: const Icon(Icons.flash_on, color: Colors.white),
                       onPressed: () {
-                        // Logika flash kamu (jika ada)
+                        // Logika flash Anda
                       },
                     ),
                   ),
