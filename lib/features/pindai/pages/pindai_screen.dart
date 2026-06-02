@@ -368,16 +368,19 @@ class _PindaiScreenState extends State<PindaiScreen>
                                     bottomSheetContext,
                                     'https://tse2.mm.bing.net/th/id/OIP.ldM_LBn8yXEyAQUre6fNEgHaFk?rs=1&pid=ImgDetMain&o=7&rm=3',
                                     140,
+                                    'Pot Tanaman Kucing',
                                   ),
                                   _buildInteractiveGridImage(
                                     bottomSheetContext,
                                     'https://tse3.mm.bing.net/th/id/OIP.1I5SylKEhBHAWzvS7WrOwQHaFj?w=650&h=488&rs=1&pid=ImgDetMain&o=7&rm=3',
                                     110,
+                                    'Celengan Babi',
                                   ),
                                   _buildInteractiveGridImage(
                                     bottomSheetContext,
                                     'https://down-id.img.susercontent.com/file/id-11134207-7qul3-lf6yi5rqn8sd10',
                                     150,
+                                    'Kotak Tisu Estetik',
                                   ),
                                 ],
                               ),
@@ -390,16 +393,19 @@ class _PindaiScreenState extends State<PindaiScreen>
                                     bottomSheetContext,
                                     'https://img.lazcdn.com/g/ff/kf/S4c6d550f095c4483a41cdb266ddfb45b5.jpg_720x720q80.jpg',
                                     95,
+                                    'Bunga Hias Meja',
                                   ),
                                   _buildInteractiveGridImage(
                                     bottomSheetContext,
                                     'https://patch.com/img/cdn/users/41476/2012/10/raw/e8a0585a991d35d779f6592b18366260.jpg',
                                     170,
+                                    'Lampion Botol Bekas',
                                   ),
                                   _buildInteractiveGridImage(
                                     bottomSheetContext,
                                     'https://cf.shopee.co.id/file/2d8e178d4992e9544634846ec2d894ea',
                                     120,
+                                    'Mainan Mobil Kardus',
                                   ),
                                 ],
                               ),
@@ -700,19 +706,31 @@ class _PindaiScreenState extends State<PindaiScreen>
     );
   }
 
-  Widget _buildInteractiveGridImage(
-    BuildContext bSheetContext,
-    String url,
-    double height,
-  ) {
-    return GestureDetector(
-      onTap: () {
-        // Pindahkan langsung ke halaman detail karya tanpa menutup bottom sheet
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => DetailKaryaPage(imageUrl: url)),
-        );
-      },
+Widget _buildInteractiveGridImage(
+  BuildContext bSheetContext,
+  String url,
+  double height,
+  String title, // <-- TAMBAHIN PARAMETER INI BRO
+) {
+  return GestureDetector(
+    onTap: () {
+      // --- 1. LAPOR KE PROVIDER SEBELUM PINDAH ---
+      // Kita catat ide ini sebagai "Ide Dilihat"
+      context.read<HistoryProvider>().viewIde(title);
+      // ------------------------------------------
+
+      // 2. Pindahkan ke halaman detail karya
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DetailKaryaPage(
+            imageUrl: url,
+            // Jika DetailKaryaPage butuh title, lo bisa oper sekalian di sini:
+            // title: title, 
+          ),
+        ),
+      );
+    },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         child: ClipRRect(

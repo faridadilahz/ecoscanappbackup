@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:ecoscan/providers/history_provider.dart';
 
 class PanduanInteraktifPage extends StatefulWidget {
   final String title;
@@ -333,7 +335,11 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                context.read<HistoryProvider>().createBarang(widget.title);
+
+                Navigator.pop(context);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF17AC64),
                 foregroundColor: Colors.white,
