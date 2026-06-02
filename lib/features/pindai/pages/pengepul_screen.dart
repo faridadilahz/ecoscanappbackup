@@ -591,22 +591,6 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
             ),
         ],
       ),
-
-      // 6. BOTTOM NAVIGATION BAR
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1, 
-        onTap: (index) {
-          Navigator.pop(context);
-        },
-        selectedItemColor: const Color(0xFF17AC64),
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Beranda"),
-          BottomNavigationBarItem(icon: Icon(Icons.qr_code_scanner_rounded), label: "Pindai"),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Eksplor"),
-        ],
-      ),
     );
   }
 }
