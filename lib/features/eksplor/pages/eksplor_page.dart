@@ -18,6 +18,51 @@ class DaurUlangModel {
     required this.timeEstimate,
     required this.imageUrl,
   });
+
+  static final List<DaurUlangModel> allIdeas = [
+    DaurUlangModel(
+      title: "Pot Tanaman Kucing",
+      category: "Botol",
+      difficulty: "Mudah",
+      timeEstimate: "10-15 menit",
+      imageUrl: "https://tse2.mm.bing.net/th/id/OIP.ldM_LBn8yXEyAQUre6fNEgHaFk?rs=1&pid=ImgDetMain&o=7&rm=3",
+    ),
+    DaurUlangModel(
+      title: "Celengan Babi",
+      category: "Plastik",
+      difficulty: "Sedang",
+      timeEstimate: "20-30 menit",
+      imageUrl: "https://tse3.mm.bing.net/th/id/OIP.1I5SylKEhBHAWzvS7WrOwQHaFj?w=650&h=488&rs=1&pid=ImgDetMain&o=7&rm=3",
+    ),
+    DaurUlangModel(
+      title: "Kotak Tisu Estetik",
+      category: "Kardus",
+      difficulty: "Mudah",
+      timeEstimate: "15-20 menit",
+      imageUrl: "https://down-id.img.susercontent.com/file/id-11134207-7qul3-lf6yi5rqn8sd10",
+    ),
+    DaurUlangModel(
+      title: "Bunga Hias Meja",
+      category: "Kertas",
+      difficulty: "Sangat Mudah",
+      timeEstimate: "5-10 menit",
+      imageUrl: "https://img.lazcdn.com/g/ff/kf/S4c6d550f095c4483a41cdb266ddfb45b5.jpg_720x720q80.jpg",
+    ),
+    DaurUlangModel(
+      title: "Lampion Botol Bekas",
+      category: "Botol",
+      difficulty: "Susah",
+      timeEstimate: "45-60 menit",
+      imageUrl: "https://patch.com/img/cdn/users/41476/2012/10/raw/e8a0585a991d35d779f6592b18366260.jpg",
+    ),
+    DaurUlangModel(
+      title: "Mainan Mobil Kardus",
+      category: "Kardus",
+      difficulty: "Sedang",
+      timeEstimate: "30-40 menit",
+      imageUrl: "https://cf.shopee.co.id/file/2d8e178d4992e9544634846ec2d894ea",
+    ),
+  ];
 }
 
 class EksplorPage extends StatefulWidget {
@@ -45,50 +90,7 @@ class _EksplorPageState extends State<EksplorPage> {
   @override
   void initState() {
     super.initState();
-    allIdeas = [
-      DaurUlangModel(
-        title: "Pot Tanaman Kucing",
-        category: "Botol",
-        difficulty: "Mudah",
-        timeEstimate: "10-15 menit",
-        imageUrl: "https://tse2.mm.bing.net/th/id/OIP.ldM_LBn8yXEyAQUre6fNEgHaFk?rs=1&pid=ImgDetMain&o=7&rm=3",
-      ),
-      DaurUlangModel(
-        title: "Celengan Babi",
-        category: "Plastik",
-        difficulty: "Sedang",
-        timeEstimate: "20-30 menit",
-        imageUrl: "https://tse3.mm.bing.net/th/id/OIP.1I5SylKEhBHAWzvS7WrOwQHaFj?w=650&h=488&rs=1&pid=ImgDetMain&o=7&rm=3",
-      ),
-      DaurUlangModel(
-        title: "Kotak Tisu Estetik",
-        category: "Kardus",
-        difficulty: "Mudah",
-        timeEstimate: "15-20 menit",
-        imageUrl: "https://down-id.img.susercontent.com/file/id-11134207-7qul3-lf6yi5rqn8sd10",
-      ),
-      DaurUlangModel(
-        title: "Bunga Hias Meja",
-        category: "Kertas",
-        difficulty: "Sangat Mudah",
-        timeEstimate: "5-10 menit",
-        imageUrl: "https://img.lazcdn.com/g/ff/kf/S4c6d550f095c4483a41cdb266ddfb45b5.jpg_720x720q80.jpg",
-      ),
-      DaurUlangModel(
-        title: "Lampion Botol Bekas",
-        category: "Botol",
-        difficulty: "Susah",
-        timeEstimate: "45-60 menit",
-        imageUrl: "https://patch.com/img/cdn/users/41476/2012/10/raw/e8a0585a991d35d779f6592b18366260.jpg",
-      ),
-      DaurUlangModel(
-        title: "Mainan Mobil Kardus",
-        category: "Kardus",
-        difficulty: "Sedang",
-        timeEstimate: "30-40 menit",
-        imageUrl: "https://cf.shopee.co.id/file/2d8e178d4992e9544634846ec2d894ea",
-      ),
-    ];
+    allIdeas = DaurUlangModel.allIdeas;
   }
 
   List<DaurUlangModel> get filteredIdeas {
