@@ -2,33 +2,49 @@ import 'package:flutter/material.dart';
 import 'panduan_interaktif_pindai.dart';
 
 class DetailKaryaPage extends StatelessWidget {
-  // 1. TAMBAHKAN VARIABEL UNTUK MENAMPUNG URL GAMBAR DINAMIS
+  final String title;
+  final String category;
+  final String price;
+  final String estimation;
+  final String description;
+  final List<String> toolsAndMaterials;
+  final List<String> steps;
   final String imageUrl;
 
-  // 2. PASANGKAN DI CONSTRUCTOR (Hapus kata const paling depan karena nilainya dinamis)
-  const DetailKaryaPage({super.key, required this.imageUrl});
+  const DetailKaryaPage({
+    super.key,
+    required this.title,
+    required this.category,
+    required this.price,
+    required this.estimation,
+    required this.description,
+    required this.toolsAndMaterials,
+    required this.steps,
+    required this.imageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
     final Color primaryGreen = const Color(0xFF17AC64);
 
-    // DATA ALAT DAN BAHAN (Disesuaikan persis dengan gambar mockup)
-    final List<Map<String, dynamic>> toolsAndMaterials = [
-      {"icon": Icons.content_cut_rounded, "label": "Gunting/\nCutter"},
-      {"icon": Icons.format_color_fill_rounded, "label": "Cat Akrilik"},
-      {"icon": Icons.delete_outline_rounded, "label": "1 Botol\nPlastik"},
-      {"icon": Icons.edit_rounded, "label": "Pensil"},
-    ];
+    final List<Map<String, dynamic>> mappedTools = this.toolsAndMaterials.map((tool) {
+      IconData icon = Icons.build_rounded;
+      final t = tool.toLowerCase();
+      if (t.contains('gunting') || t.contains('cutter') || t.contains('potong')) {
+        icon = Icons.content_cut_rounded;
+      } else if (t.contains('cat') || t.contains('warna') || t.contains('lukis')) {
+        icon = Icons.format_color_fill_rounded;
+      } else if (t.contains('botol') || t.contains('plastik') || t.contains('wadah') || t.contains('kaleng') || t.contains('kardus') || t.contains('gelas')) {
+        icon = Icons.delete_outline_rounded;
+      } else if (t.contains('pensil') || t.contains('pena') || t.contains('spidol') || t.contains('gambar') || t.contains('tulis')) {
+        icon = Icons.edit_rounded;
+      } else if (t.contains('lem') || t.contains('perekat') || t.contains('selotip') || t.contains('perekat')) {
+        icon = Icons.bolt;
+      }
+      return {"icon": icon, "label": tool};
+    }).toList();
 
-    // DATA CARA MEMBUAT
-    final List<String> steps = [
-      "Menggambar pola pada botol bekas yang akan kamu buat. Kamu bisa menggambar hewan, bunga, atau beberapa buah-buahan.",
-      "Kemudian gambar sesuka hati kamu, lalu potong mengikuti pola gambaran pada botol.",
-      "Kemudian siapkan cat akrilik, lalu warnai semua botol yang sudah digambar dengan warna dasar seperti putih.",
-      "Selanjutnya, kamu dapat mewarnai sesuai dengan karakter yang kamu buat, sesuaikan dengan gambaran serta pola yang sudah ada di botol sesuka hati.",
-      "Jika sudah diwarnai, keringkan botol agar cat tidak luntur.",
-      "Botol bekas sudah siap dijadikan sebagai pot bunga yang cantik."
-    ];
+    final List<Map<String, dynamic>> toolsAndMaterials = mappedTools;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -39,15 +55,24 @@ class DetailKaryaPage extends StatelessWidget {
             // Header Gambar Dinamis (Mengikuti yang di-klik pengguna)
             Stack(
               children: [
-                Container(
+                SizedBox(
                   height: 320,
                   width: double.infinity,
-                  decoration: BoxDecoration( // Hapus const di sini karena memakai variabel imageUrl
-                    image: DecorationImage(
-                      // 3. GANTI URL STATIS DENGAN VARIABEL imageUrl
-                      image: NetworkImage(imageUrl), 
-                      fit: BoxFit.cover,
-                    ),
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.grey,
+                            size: 48,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 // Tombol Back Bulat Putih
@@ -88,18 +113,18 @@ class DetailKaryaPage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Pot Tanaman Kucing',
-                              style: TextStyle(
+                            Text(
+                              title,
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF1E1E1E),
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
-                              "Botol plastik • PET",
-                              style: TextStyle(
+                            Text(
+                              category,
+                              style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.black38,
                               ),
@@ -110,9 +135,9 @@ class DetailKaryaPage extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text(
-                            "Rp10.000",
-                            style: TextStyle(
+                          Text(
+                            price,
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF1E1E1E),
@@ -120,7 +145,7 @@ class DetailKaryaPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Mudah • 10-15 menit",
+                            estimation,
                             style: TextStyle(
                               fontSize: 13,
                               color: primaryGreen,
@@ -134,9 +159,9 @@ class DetailKaryaPage extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // Deskripsi Meowholder (Sesuai teks gambar mockup)
-                  const Text(
-                    "Meowholder adalah tempat pensil berbahan dasar botol plastik bekas yang dirancangkan menyerupai tubuh kucing. Desainnya unik karena tidak hanya berfungsi sebagai tempat penyimpanan alat tulis, tetapi juga memiliki bentuk yang lucu dan menarik sehingga dapat mempercantik meja belajar.",
-                    style: TextStyle(
+                  Text(
+                    description,
+                    style: const TextStyle(
                       color: Colors.black45,
                       fontSize: 14,
                       height: 1.4,
@@ -307,8 +332,8 @@ class DetailKaryaPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const PanduanInteraktifPage(
-                              title: 'Pot Tanaman Kucing',
+                            builder: (context) => PanduanInteraktifPage(
+                              title: title,
                             ),
                           ),
                         );

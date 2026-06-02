@@ -1,3 +1,4 @@
+import 'dart:convert'; // jsonEncode & base64
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -5,12 +6,18 @@ import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:ecoscan/providers/history_provider.dart';
+import 'package:http/http.dart' as http; // Untuk hit API
 import 'pengepul_screen.dart';
-import 'detail_karya_screen.dart';
+import 'package:ecoscan/features/eksplor/pages/eksplor_page.dart';
+import 'package:ecoscan/features/eksplor/pages/eksplor_detail_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+// API Key dimuat secara dinamis dari file .env lokal (diabaikan oleh Git)
+final String openRouterApiKey = dotenv.env['OPENROUTER_API_KEY'] ?? '';
 
 class PindaiScreen extends StatefulWidget {
-  final Function(int) onTapMenu; // Terima fungsi navigasi dari HomeScreen
-  final int previousIndex; // Terima index halaman terakhir
+  final Function(int) onTapMenu; 
+  final int previousIndex; 
   final int currentIndex;
   final bool isActive;
   final bool isFromScanButton; // Tambahkan parameter baru ini
@@ -31,7 +38,6 @@ class PindaiScreen extends StatefulWidget {
 class _PindaiScreenState extends State<PindaiScreen>
     with SingleTickerProviderStateMixin {
   bool _isScanning = false;
-  bool _showHasil = false; // Menambahkan variabel state yang sebelumnya kurang deklarasi
   int _scanSessionCounter = 0;
   late AnimationController _animationController;
 
@@ -42,8 +48,20 @@ class _PindaiScreenState extends State<PindaiScreen>
   XFile? _galleryImage;
   final ImagePicker _picker = ImagePicker();
 
-  final Color primaryGreen = const Color(0xFF27AE60);
+  // Variabel dinamis dari AI
+  String _namaSampahAI = 'Memuat...';
+  String _jenisSampahAI = 'Memuat...';
+  String _hargaSampahAI = 'Rp4.000/kg';
+  
+  // State Skor Penilaian dari AI (Dibuat Dinamis)
+  int _skorKebersihan = 0;
+  int _skorKondisiFisik = 0;
+  int _skorKelayakan = 0;
 
+  // Daftar rekomendasi karya yang akan berubah sesuai jenis sampah
+  List<DaurUlangModel> _rekomendasiKarya = [];
+
+  final Color primaryGreen = const Color(0xFF27AE60);
   final double boxWidth = 320.0;
   final double boxHeight = 460.0;
 
@@ -150,7 +168,7 @@ class _PindaiScreenState extends State<PindaiScreen>
         setState(() {
           _galleryImage = image;
         });
-        _startScan();
+        _prosesDanKirimKeAI(image);
       }
     } catch (e) {
       debugPrint("Error membuka galeri: $e");
@@ -168,49 +186,116 @@ class _PindaiScreenState extends State<PindaiScreen>
       setState(() {
         _galleryImage = shotImage;
       });
-      _startScan();
+      _prosesDanKirimKeAI(shotImage);
     } catch (e) {
       debugPrint("Gagal menjepret gambar dari webcam: $e");
     }
   }
 
-  void _startScan() {
+  Future<void> _prosesDanKirimKeAI(XFile imageFile) async {
     _scanSessionCounter++;
     final currentSession = _scanSessionCounter;
+
     setState(() {
       _isScanning = true;
+      _namaSampahAI = 'Menganalisis...';
+      _jenisSampahAI = 'Memuat...';
     });
     _animationController.forward();
 
-    Future.delayed(const Duration(seconds: 8), () {
-      if (mounted &&
-          widget.isActive &&
-          _isScanning &&
-          _scanSessionCounter == currentSession &&
-          ModalRoute.of(context)?.isCurrent == true) {
+    try {
+      final List<int> imageBytes = await imageFile.readAsBytes();
+      final String base64Image = base64Encode(imageBytes);
+
+      // FIX: Endpoint & model disesuaikan dengan versi rilis stabil agar tidak memicu 404
+      final response = await http.post(
+        Uri.parse('https://openrouter.ai/api/v1/chat/completions'),
+        headers: {
+          'Authorization': 'Bearer $openRouterApiKey',
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://ecoscan.id', 
+          'X-Title': 'EcoScan App',
+        },
+        body: jsonEncode({
+          "model": "google/gemini-2.5-flash", 
+          "max_tokens": 1000,
+          "messages": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Analisis gambar sampah ini. Berikan respon wajib berupa JSON mentah pendek tanpa format markdown dengan struktur: "
+                          "{"
+                          "\"nama\": \"Nama barang\", "
+                          "\"jenis\": \"Kategori Ringkas (Botol/Plastik/Kertas/Kardus/Lainnya)\", "
+                          "\"harga\": \"Rp4.000/kg\", "
+                          "\"kebersihan\": 90, "
+                          "\"kondisi\": 85, "
+                          "\"kelayakan\": 95"
+                          "}. "
+                          "Gunakan nilai integer untuk kebersihan, kondisi, dan kelayakan (skala 0-100). Tentukan harga taksiran barang bekas per kg (tulis satuan seperti /kg atau /pcs)."
+                },
+                {
+                  "type": "image_url",
+                  "image_url": {
+                    "url": "data:image/jpeg;base64,$base64Image"
+                  }
+                }
+              ]
+            }
+          ]
+        }),
+      );
+
+      if (!mounted || currentSession != _scanSessionCounter || !widget.isActive) return;
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        String aiContent = responseData['choices'][0]['message']['content'].toString().trim();
+        
+        // Pembersihan jika AI nakal tetap memberikan tag markdown ```json
+        if (aiContent.startsWith('```')) {
+          aiContent = aiContent.replaceAll(RegExp(r'^```(json)?\n|```$'), '').trim();
+        }
+
+        final Map<String, dynamic> parsedResult = jsonDecode(aiContent);
+
         setState(() {
           _isScanning = false;
-          _showHasil = true;
+          _namaSampahAI = parsedResult['nama'] ?? 'Sampah Tidak Dikenal';
+          _jenisSampahAI = parsedResult['jenis'] ?? 'Residu';
+          _hargaSampahAI = parsedResult['harga'] ?? 'Rp4.000/kg';
+          
+          _skorKebersihan = parsedResult['kebersihan'] ?? 80;
+          _skorKondisiFisik = parsedResult['kondisi'] ?? 80;
+          _skorKelayakan = parsedResult['kelayakan'] ?? 80;
+
+          _rekomendasiKarya = _getMatchingIdeas(_jenisSampahAI);
         });
         _animationController.stop();
-        context.read<HistoryProvider>().addScan('Botol Air Mineral');
+
+        // Daftarkan ke provider history
+        context.read<HistoryProvider>().addScan(_namaSampahAI);
         _showHasilBottomSheet();
       } else {
-        if (mounted) {
-          setState(() {
-            _isScanning = false;
-          });
-          _animationController.stop();
-        }
+        throw Exception("Server memberikan kode error: ${response.statusCode}\nDetail: ${response.body}");
       }
-    });
+    } catch (e) {
+      debugPrint("Gagal memproses AI: $e");
+      if (mounted && currentSession == _scanSessionCounter) {
+        setState(() {
+          _isScanning = false;
+        });
+        _animationController.stop();
+        _showErrorSnackBar("Gagal menganalisis objek. Hubungan ke server terputus.");
+      }
+    }
   }
 
-  // Fungsi khusus untuk mereset seluruh state halaman kembali ke kamera awal
   void _resetPindaiPage() {
     setState(() {
       _galleryImage = null;
-      _showHasil = false;
       _isScanning = false;
     });
     _animationController.stop();
@@ -262,34 +347,36 @@ class _PindaiScreenState extends State<PindaiScreen>
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Botol Air Mineral',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _namaSampahAI,
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Plastik • PET',
-                                  style: TextStyle(
-                                    color: Colors.grey[400],
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _jenisSampahAI,
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                const Text(
-                                  'Rp4.000/kg',
-                                  style: TextStyle(
+                                Text(
+                                  _hargaSampahAI,
+                                  style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black87,
@@ -301,8 +388,7 @@ class _PindaiScreenState extends State<PindaiScreen>
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            const PengepulScreen(),
+                                        builder: (context) => const PengepulScreen(),
                                       ),
                                     );
                                   },
@@ -341,13 +427,9 @@ class _PindaiScreenState extends State<PindaiScreen>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _buildFigmaScoreCard('Kebersihan', '90/100', 0.9),
-                            _buildFigmaScoreCard(
-                              'Kondisi Fisik',
-                              '100/100',
-                              1.0,
-                            ),
-                            _buildFigmaScoreCard('Kelayakan', '95/100', 0.95),
+                            _buildFigmaScoreCard('Kebersihan', '$_skorKebersihan/100', _skorKebersihan / 100),
+                            _buildFigmaScoreCard('Kondisi Fisik', '$_skorKondisiFisik/100', _skorKondisiFisik / 100),
+                            _buildFigmaScoreCard('Kelayakan', '$_skorKelayakan/100', _skorKelayakan / 100),
                           ],
                         ),
                         const SizedBox(height: 32),
@@ -360,60 +442,26 @@ class _PindaiScreenState extends State<PindaiScreen>
                           ),
                         ),
                         const SizedBox(height: 16),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  _buildInteractiveGridImage(
+                        _rekomendasiKarya.isEmpty
+                            ? const Text("Tidak ada rekomendasi karya daur ulang untuk item ini.")
+                            : GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: _rekomendasiKarya.length,
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                  childAspectRatio: 0.85,
+                                ),
+                                itemBuilder: (context, index) {
+                                  final item = _rekomendasiKarya[index];
+                                  return _buildInteractiveGridItem(
                                     bottomSheetContext,
-                                    'https://tse2.mm.bing.net/th/id/OIP.ldM_LBn8yXEyAQUre6fNEgHaFk?rs=1&pid=ImgDetMain&o=7&rm=3',
-                                    140,
-                                    'Pot Tanaman Kucing',
-                                  ),
-                                  _buildInteractiveGridImage(
-                                    bottomSheetContext,
-                                    'https://tse3.mm.bing.net/th/id/OIP.1I5SylKEhBHAWzvS7WrOwQHaFj?w=650&h=488&rs=1&pid=ImgDetMain&o=7&rm=3',
-                                    110,
-                                    'Celengan Babi',
-                                  ),
-                                  _buildInteractiveGridImage(
-                                    bottomSheetContext,
-                                    'https://down-id.img.susercontent.com/file/id-11134207-7qul3-lf6yi5rqn8sd10',
-                                    150,
-                                    'Kotak Tisu Estetik',
-                                  ),
-                                ],
+                                    item,
+                                  );
+                                },
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  _buildInteractiveGridImage(
-                                    bottomSheetContext,
-                                    'https://img.lazcdn.com/g/ff/kf/S4c6d550f095c4483a41cdb266ddfb45b5.jpg_720x720q80.jpg',
-                                    95,
-                                    'Bunga Hias Meja',
-                                  ),
-                                  _buildInteractiveGridImage(
-                                    bottomSheetContext,
-                                    'https://patch.com/img/cdn/users/41476/2012/10/raw/e8a0585a991d35d779f6592b18366260.jpg',
-                                    170,
-                                    'Lampion Botol Bekas',
-                                  ),
-                                  _buildInteractiveGridImage(
-                                    bottomSheetContext,
-                                    'https://cf.shopee.co.id/file/2d8e178d4992e9544634846ec2d894ea',
-                                    120,
-                                    'Mainan Mobil Kardus',
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
                         const SizedBox(height: 40),
                       ],
                     ),
@@ -425,11 +473,8 @@ class _PindaiScreenState extends State<PindaiScreen>
         );
       },
     ).then((_) {
-      // Ketika bottom sheet ditutup secara manual (di-swipe kebawah)
       if (mounted) {
-        setState(() {
-          _showHasil = false;
-        });
+        setState(() {});
       }
     });
   }
@@ -447,38 +492,27 @@ class _PindaiScreenState extends State<PindaiScreen>
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // 1. AREA PREVIEW LIVE KAMERA LAPTOP / GAMBAR GALERI
           Positioned.fill(
             child: _galleryImage != null
                 ? (kIsWeb
                     ? Image.network(_galleryImage!.path, fit: BoxFit.cover)
-                    : Image.file(
-                        File(_galleryImage!.path),
-                        fit: BoxFit.cover,
-                      ))
+                    : Image.file(File(_galleryImage!.path), fit: BoxFit.cover))
                 : (_isCameraInitialized
                     ? CameraPreview(_cameraController!)
                     : const Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            CircularProgressIndicator(
-                              color: Color(0xFF27AE60),
-                            ),
+                            CircularProgressIndicator(color: Color(0xFF27AE60)),
                             SizedBox(height: 16),
                             Text(
                               "Menghubungkan ke kamera...",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
+                              style: TextStyle(color: Colors.white, fontSize: 14),
                             ),
                           ],
                         ),
                       )),
           ),
-
-          // 2. TOMBOL NAVIGASI ATAS
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -491,12 +525,10 @@ class _PindaiScreenState extends State<PindaiScreen>
                           backgroundColor: Colors.black45,
                           child: IconButton(
                             icon: const Icon(Icons.arrow_back, color: Colors.white),
-                            onPressed: () {
-                              _resetPindaiPage();
-                            },
+                            onPressed: _resetPindaiPage,
                           ),
                         )
-                      : widget.isFromScanButton // SEKARANG BERPATOKAN PADA FLAG INI
+                      : (widget.isFromScanButton // SEKARANG BERPATOKAN PADA FLAG INI
                           ? CircleAvatar(
                               backgroundColor: Colors.black45,
                               child: IconButton(
@@ -507,7 +539,7 @@ class _PindaiScreenState extends State<PindaiScreen>
                                 },
                               ),
                             )
-                          : const SizedBox(width: 40, height: 40), // Sembunyi jika lewat navbar bawah
+                          : const SizedBox(width: 40, height: 40)), // Sembunyi jika lewat navbar bawah
 
                   // --- TOMBOL KANAN (FLASH) ---
                   CircleAvatar(
@@ -523,8 +555,6 @@ class _PindaiScreenState extends State<PindaiScreen>
               ),
             ),
           ),
-          
-          // 3. KOTAK TARGET SCANNER (Tengah)
           Center(
             child: Container(
               width: boxWidth,
@@ -535,8 +565,6 @@ class _PindaiScreenState extends State<PindaiScreen>
               ),
             ),
           ),
-
-          // 4. ANIMASI LASER SCANNER
           if (_isScanning)
             Center(
               child: ClipRRect(
@@ -574,8 +602,6 @@ class _PindaiScreenState extends State<PindaiScreen>
                 ),
               ),
             ),
-
-          // 5. STATUS PILL SCANNING
           if (_isScanning)
             Positioned(
               top: 100,
@@ -583,26 +609,18 @@ class _PindaiScreenState extends State<PindaiScreen>
               right: 0,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 10,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   decoration: BoxDecoration(
                     color: primaryGreen.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: const Text(
-                    'Memindai...',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    'Memindai dengan AI...',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
             ),
-
-          // 6. PANEL TOMBOL KONTROL (Bawah)
           if (!_isScanning)
             Positioned(
               bottom: 40,
@@ -614,18 +632,11 @@ class _PindaiScreenState extends State<PindaiScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Tombol Galeri (Kiri)
                       IconButton(
-                        icon: const Icon(
-                          Icons.photo_library,
-                          color: Colors.white,
-                          size: 28,
-                        ),
+                        icon: const Icon(Icons.photo_library, color: Colors.white, size: 28),
                         onPressed: _getImageFromGallery,
                       ),
                       const SizedBox(width: 32),
-                      
-                      // Tombol Utama / Shutter (Tengah)
                       GestureDetector(
                         onTap: () {
                           if (_galleryImage != null) {
@@ -644,28 +655,19 @@ class _PindaiScreenState extends State<PindaiScreen>
                             radius: 35,
                             backgroundColor: Colors.white,
                             child: _galleryImage != null
-                                ? const Icon(
-                                    Icons.keyboard_arrow_up,
-                                    color: Colors.black, // Menggunakan warna tunggal (bukan primaryGreen yang tertumpuk)
-                                    size: 35,
-                                  )
+                                ? const Icon(Icons.keyboard_arrow_up, color: Colors.black, size: 35)
                                 : const SizedBox.shrink(),
                           ),
                         ),
                       ),
-                      
                       const SizedBox(width: 32),
-                      const SizedBox(width: 48), // Spacer penyeimbang tombol galeri kiri
+                      const SizedBox(width: 48), 
                     ],
                   ),
                   const SizedBox(height: 12),
                   Text(
                     _galleryImage != null ? 'Buka Hasil Sebelumnya' : '',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ],
               ),
@@ -688,17 +690,15 @@ class _PindaiScreenState extends State<PindaiScreen>
         children: [
           Text(
             title,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
-              value: percentage,
+              value: percentage.clamp(0.0, 1.0),
               backgroundColor: Colors.grey[200],
               valueColor: AlwaysStoppedAnimation<Color>(primaryGreen),
               minHeight: 4,
@@ -707,54 +707,87 @@ class _PindaiScreenState extends State<PindaiScreen>
           const SizedBox(height: 8),
           Text(
             score,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[400],
-            ),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87),
           ),
         ],
       ),
     );
   }
 
-Widget _buildInteractiveGridImage(
-  BuildContext bSheetContext,
-  String url,
-  double height,
-  String title, // <-- TAMBAHIN PARAMETER INI BRO
-) {
-  return GestureDetector(
-    onTap: () {
-      // --- 1. LAPOR KE PROVIDER SEBELUM PINDAH ---
-      // Kita catat ide ini sebagai "Ide Dilihat"
-      context.read<HistoryProvider>().viewIde(title);
-      // ------------------------------------------
-
-      // 2. Pindahkan ke halaman detail karya
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DetailKaryaPage(
-            imageUrl: url,
-            // Jika DetailKaryaPage butuh title, lo bisa oper sekalian di sini:
-            // title: title, 
+  Widget _buildInteractiveGridItem(BuildContext bSheetContext, DaurUlangModel idea) {
+    return GestureDetector(
+      onTap: () {
+        context.read<HistoryProvider>().viewIde(idea.title);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EksplorDetailPage(
+              idea: idea,
+            ),
           ),
-        ),
-      );
-    },
+        );
+      },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        child: ClipRRect(
+        decoration: BoxDecoration(
+          color: const Color(0xFFFAFAFA),
           borderRadius: BorderRadius.circular(16),
-          child: Image.network(
-            url,
-            height: height,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+                child: Image.network(
+                  idea.imageUrl,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.broken_image, color: Colors.grey),
+                    );
+                  },
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                idea.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  List<DaurUlangModel> _getMatchingIdeas(String category) {
+    final c = category.toLowerCase();
+    String targetCategory = '';
+    
+    if (c.contains('botol')) {
+      targetCategory = 'Botol';
+    } else if (c.contains('plastik')) {
+      targetCategory = 'Plastik';
+    } else if (c.contains('kardus') || c.contains('karton') || c.contains('kotak')) {
+      targetCategory = 'Kardus';
+    } else if (c.contains('kertas') || c.contains('buku')) {
+      targetCategory = 'Kertas';
+    }
+    
+    final matches = DaurUlangModel.allIdeas.where((idea) => idea.category == targetCategory).toList();
+    if (matches.isNotEmpty) {
+      return matches;
+    }
+    
+    return DaurUlangModel.allIdeas.take(2).toList();
   }
 }

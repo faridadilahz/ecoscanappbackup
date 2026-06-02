@@ -42,6 +42,8 @@ dependencies:
   flutter_map: ^6.1.0
   latlong2: ^0.9.1
   provider: ^6.1.5+1
+  http: ^1.2.2
+  flutter_dotenv: ^5.2.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -68,6 +70,7 @@ flutter:
   assets:
     - assets/images/
     - lib/features/eksplor/images/
+    - .env
 
   fonts:
     - family: Bricolage-Grotesque
