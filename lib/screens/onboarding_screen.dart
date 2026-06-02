@@ -106,6 +106,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF2E2E2E),
+                            height: 1.1,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -115,6 +116,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black38,
+                            height: 1.1,
                           ),
                         ),
                       ],
