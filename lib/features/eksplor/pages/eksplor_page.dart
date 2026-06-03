@@ -215,15 +215,7 @@ class _EksplorPageState extends State<EksplorPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF2F4F2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.tune_rounded, color: Color(0xFF17AC64)),
-                    ),
+                    
                   ],
                 ),
               ),
