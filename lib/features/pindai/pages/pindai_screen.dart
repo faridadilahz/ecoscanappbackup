@@ -476,7 +476,7 @@ class _PindaiScreenState extends State<PindaiScreen>
       },
     ).then((_) {
       if (mounted) {
-        _resetPindaiPage();
+        setState(() {});
       }
     });
   }
