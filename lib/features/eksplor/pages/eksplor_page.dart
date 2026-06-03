@@ -50,6 +50,7 @@ class DaurUlangModel {
         "Beri lubang kecil di bagian bawah botol untuk saluran drainase air tanaman.",
         "Masukkan tanah dan tanaman hias favoritmu. Pot tanaman kucing siap dipajang!"
       ],
+      
     ),
     DaurUlangModel(
       title: "Celengan Babi",
