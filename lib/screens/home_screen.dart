@@ -2,6 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:ecoscan/features/eksplor/pages/eksplor_page.dart';
 import 'package:ecoscan/features/pindai/pages/pindai_screen.dart';
 import 'akun_beranda.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math';
+
+class EcoTip {
+  final String title;
+  final String description;
+
+  EcoTip({required this.title, required this.description});
+}
+
+// Isi EcoTips
+final List<EcoTip> ecoTipsList = [
+  EcoTip(
+    title: "Tahukah kamu?",
+    description:
+        "Membawa tempat makan/minum sendiri bisa membantu mengurangi penggunaan plastik sekali pakai setiap hari.",
+  ),
+  EcoTip(
+    title: "Hemat Energi!",
+    description:
+        "Mematikan lampu selama 1 jam saja bisa mengurangi emisi karbon yang cukup signifikan bagi bumi.",
+  ),
+  EcoTip(
+    title: "Bijak Kertas",
+    description:
+        "Menggunakan kertas dua sisi (bolak-balik) untuk mencetak dapat menyelamatkan jutaan pohon dari penebangan.",
+  ),
+];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +42,153 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   int _previousIndex = 0;
   bool _isFromScanButtonToPindai = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndShowEcoTips();
+    });
+  }
+
+  Future<void> _checkAndShowEcoTips() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? lastShownDate = prefs.getString('last_shown_eco_tips');
+
+    // Ngambil data tanggal hari ini
+    final String todayDate = DateTime.now().toIso8601String().substring(0, 10);
+
+    // Kalo hari ini belum muncul, munculin
+    if (lastShownDate != todayDate) {
+      final random = Random();
+      final randomTip = ecoTipsList[random.nextInt(ecoTipsList.length)];
+
+      if (mounted) {
+        _showEcoTipsDialog(context, randomTip);
+      }
+
+      // Simpen tanggal hari ini ke preference
+      await prefs.setString('last_shown_eco_tips', todayDate);
+    }
+  }
+
+  void _showEcoTipsDialog(BuildContext context, EcoTip tip) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 8),
+                  // Badge Topik "Eco Tips"
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F8F0),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.notes, color: Color(0xFF17AC64), size: 14),
+                        SizedBox(width: 6),
+                        Text(
+                          "Eco Tips",
+                          style: TextStyle(
+                            color: Color(0xFF17AC64),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Image card EcoTips
+                  Image.asset(
+                    'assets/images/vectorecotips.png', // <-- Ganti sesuai nama file PNG lo
+                    height: 160, // Atur tingginya sesuai kecocokan di layar
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Judul card EcoTips (Acak)
+                  Text(
+                    tip.title,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0D9455),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Deskripsi card EcoTips (Acak)
+                  Text(
+                    tip.description,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade600,
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+
+                  // Tombol Mengerti EcoTips
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF17AC64),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        "Mengerti",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Tombol close card EcoTips
+            Positioned(
+              right: 16,
+              top: 16,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Icon(Icons.close, color: Colors.grey.shade400, size: 24),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _changePage(int index) {
     setState(() {
@@ -53,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FBF9),
       body: IndexedStack(index: _currentIndex, children: _pages),
-      
+
       bottomNavigationBar: Stack(
         alignment: Alignment.topCenter,
         clipBehavior: Clip.none,
@@ -71,19 +246,27 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   // === MENU BERANDA (HITBOX DIKECILKAN) ===
                   Expanded(
-                    child: Center( // Menjaga isi tetap di tengah struktur Grid
+                    child: Center(
+                      // Menjaga isi tetap di tengah struktur Grid
                       child: InkWell(
                         onTap: () => _changePage(0),
-                        borderRadius: BorderRadius.circular(12), // Efek splash membulat rapi seukuran teks
+                        borderRadius: BorderRadius.circular(
+                          12,
+                        ), // Efek splash membulat rapi seukuran teks
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0), // Hitbox kustom yang pas
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 4.0,
+                          ), // Hitbox kustom yang pas
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.home_filled,
-                                color: _currentIndex == 0 ? const Color(0xFF17AC64) : Colors.grey,
+                                color: _currentIndex == 0
+                                    ? const Color(0xFF17AC64)
+                                    : Colors.grey,
                                 size: 26,
                               ),
                               const SizedBox(height: 4),
@@ -91,8 +274,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                 "Beranda",
                                 style: TextStyle(
                                   fontSize: 12,
-                                  fontWeight: _currentIndex == 0 ? FontWeight.bold : FontWeight.normal,
-                                  color: _currentIndex == 0 ? const Color(0xFF17AC64) : Colors.grey,
+                                  fontWeight: _currentIndex == 0
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: _currentIndex == 0
+                                      ? const Color(0xFF17AC64)
+                                      : Colors.grey,
                                 ),
                               ),
                             ],
@@ -107,19 +294,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   // === MENU EKSPLOR (HITBOX DIKECILKAN) ===
                   Expanded(
-                    child: Center( // Menjaga isi tetap di tengah struktur Grid
+                    child: Center(
+                      // Menjaga isi tetap di tengah struktur Grid
                       child: InkWell(
                         onTap: () => _changePage(2),
                         borderRadius: BorderRadius.circular(12),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0), // Hitbox kustom yang pas
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 4.0,
+                          ), // Hitbox kustom yang pas
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.search,
-                                color: _currentIndex == 2 ? const Color(0xFF17AC64) : Colors.grey,
+                                color: _currentIndex == 2
+                                    ? const Color(0xFF17AC64)
+                                    : Colors.grey,
                                 size: 26,
                               ),
                               const SizedBox(height: 4),
@@ -127,8 +320,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                 "Eksplor",
                                 style: TextStyle(
                                   fontSize: 12,
-                                  fontWeight: _currentIndex == 2 ? FontWeight.bold : FontWeight.normal,
-                                  color: _currentIndex == 2 ? const Color(0xFF17AC64) : Colors.grey,
+                                  fontWeight: _currentIndex == 2
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: _currentIndex == 2
+                                      ? const Color(0xFF17AC64)
+                                      : Colors.grey,
                                 ),
                               ),
                             ],
@@ -147,7 +344,8 @@ class _HomeScreenState extends State<HomeScreen> {
             top: -24,
             child: GestureDetector(
               onTap: () => _changePage(1),
-              behavior: HitTestBehavior.opaque, // Memastikan area klik FAB sensitif dan akurat
+              behavior: HitTestBehavior
+                  .opaque, // Memastikan area klik FAB sensitif dan akurat
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -176,8 +374,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     "Pindai",
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: _currentIndex == 1 ? FontWeight.bold : FontWeight.normal,
-                      color: _currentIndex == 1 ? const Color(0xFF17AC64) : Colors.grey,
+                      fontWeight: _currentIndex == 1
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: _currentIndex == 1
+                          ? const Color(0xFF17AC64)
+                          : Colors.grey,
                     ),
                   ),
                 ],
