@@ -16,21 +16,13 @@ class EksplorDetailPage extends StatelessWidget {
       {"icon": Icons.edit_rounded, "label": "Pensil"},
     ];
 
-    final List<String> steps = [
-      "Menggambar pola pada botol bekas yang akan kamu buat. Kamu bisa menggambar hewan, bunga, atau beberapa buah-buahan.",
-      "Kemudian gambar sesuka hati kamu, lalu potong mengikuti pola gambaran pada botol.",
-      "Kemudian siapkan cat akrilik, lalu warnai semua botol yang sudah digambar dengan warna dasar seperti putih.",
-      "Selanjutnya, kamu dapat mewarnai sesuai dengan karakter yang kamu buat, sesuaikan dengan gambaran serta pola yang sudah ada di botol sesuka hati.",
-      "Jika sudah diwarnai, keringkan botol agar cat tidak luntur.",
-      "Botol bekas sudah siap dijadikan sebagai pot bunga yang cantik.",
-    ];
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header Image dengan Tombol Back
             Stack(
               children: [
                 Container(
@@ -53,6 +45,13 @@ class EksplorDetailPage extends StatelessWidget {
                       decoration: const BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: const Icon(
                         Icons.arrow_back,
@@ -64,11 +63,14 @@ class EksplorDetailPage extends StatelessWidget {
                 ),
               ],
             ),
+            
+            // Konten Detail
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Judul, Kategori, Harga, dan Estimasi
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,11 +98,12 @@ class EksplorDetailPage extends StatelessWidget {
                           ],
                         ),
                       ),
+                      const SizedBox(width: 12),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text(
-                            "Rp10.000",
+                          Text(
+                            "${idea.price}",
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -121,19 +124,19 @@ class EksplorDetailPage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text.rich(
-                    TextSpan(
-                      text:
-                          "Meowholder adalah tempat pensil berbahan dasar botol plastik bekas yang dirancang menyerupai tubuh kucing. Desainnya unik karena tidak hanya berfungsi sebagai tempat penyimpanan alat tulis, tetapi juga memiliki bentuk yang lucu dan menarik sehingga dapat mempercantik meja belajar.",
-                      style: const TextStyle(
-                        color: Colors.black45,
-                        fontSize: 14,
-                        height: 1.4,
-                      ),
-                      children: [],
+                  
+                  // Deskripsi produk dinamis diambil dari model data yang diklik
+                  Text(
+                    idea.detailDescription,
+                    style: const TextStyle(
+                      color: Colors.black45,
+                      fontSize: 14,
+                      height: 1.4,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
+                  
+                  // Bagian Alat dan Bahan
                   const Text(
                     "Alat dan Bahan",
                     style: TextStyle(
@@ -143,25 +146,26 @@ class EksplorDetailPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  // Grid 4 box
                   GridView.builder(
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: toolsAndMaterials.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 1,
-                        ),
+                    // 🟢 PERBAIKAN 1: Tambahkan widget.idea. di depan nama variabel
+                    itemCount: idea.toolsAndMaterials.length, 
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 1,
+                    ),
                     itemBuilder: (context, index) {
-                      final item = toolsAndMaterials[index];
+                      // 🟢 PERBAIKAN 2: Tambahkan widget.idea. di depan nama variabel
+                      final item = idea.toolsAndMaterials[index];
+                      
                       return Container(
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: Colors.black12.withOpacity(0.06),
+                            color: Colors.black.withOpacity(0.06),
                           ),
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -173,12 +177,12 @@ class EksplorDetailPage extends StatelessWidget {
                               color: const Color(0xFF17AC64),
                               size: 24,
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 8),
                             Text(
                               item["label"].toString(),
                               textAlign: TextAlign.center,
                               style: const TextStyle(
-                                fontSize: 13,
+                                fontSize: 12,
                                 color: Colors.black38,
                                 height: 1.2,
                               ),
@@ -188,7 +192,9 @@ class EksplorDetailPage extends StatelessWidget {
                       );
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
+                  
+                  // Bagian Video Tutorial
                   const Text(
                     "Video Tutorial",
                     style: TextStyle(
@@ -217,7 +223,9 @@ class EksplorDetailPage extends StatelessWidget {
                         ),
                       ),
                       ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          // TODO: Implementasi buka link YouTube
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF17AC64),
                           foregroundColor: Colors.white,
@@ -242,6 +250,8 @@ class EksplorDetailPage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 24),
+                  
+                  // Bagian Langkah-Langkah Pembuatan dinamis dari model data yang diklik
                   const Text(
                     "Cara Membuat",
                     style: TextStyle(
@@ -254,7 +264,7 @@ class EksplorDetailPage extends StatelessWidget {
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: steps.length,
+                    itemCount: idea.steps.length,
                     padding: EdgeInsets.zero,
                     itemBuilder: (context, index) {
                       return Padding(
@@ -272,7 +282,7 @@ class EksplorDetailPage extends StatelessWidget {
                             ),
                             Expanded(
                               child: Text(
-                                steps[index],
+                                idea.steps[index],
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: Colors.black45,
@@ -286,6 +296,8 @@ class EksplorDetailPage extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 20),
+                  
+                  // Tombol Navigasi ke Panduan Interaktif
                   SizedBox(
                     width: double.infinity,
                     height: 48,
@@ -318,6 +330,10 @@ class EksplorDetailPage extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 6),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 18,
+                          ),
                         ],
                       ),
                     ),
