@@ -39,7 +39,7 @@ class DaurUlangModel {
       category: "Kardus",
       difficulty: "Mudah",
       timeEstimate: "15-20 menit",
-      imageUrl: "https://down-id.img.susercontent.com/file/id-11134207-7qul3-lf6yi5rqn8sd10",
+      imageUrl: "https://thf.bing.com/th/id/OIP.xzSCtei54jsAjGzM6EA0VQAAAA?w=182&h=182&c=7&r=0&o=7&cb=thfc1falcon&dpr=1.3&pid=1.7&rm=3",
     ),
     DaurUlangModel(
       title: "Bunga Hias Meja",
