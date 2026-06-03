@@ -42,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   int _previousIndex = 0;
   bool _isFromScanButtonToPindai = false;
+  EcoTip? _currentTip;
 
   @override
   void initState() {
@@ -58,16 +59,16 @@ class _HomeScreenState extends State<HomeScreen> {
     // Ngambil data tanggal hari ini
     final String todayDate = DateTime.now().toIso8601String().substring(0, 10);
 
-    // Kalo hari ini belum muncul, munculin
+    final random = Random();
+    setState(() {
+      _currentTip = ecoTipsList[random.nextInt(ecoTipsList.length)];
+    });
+
+    // Ngecek buka aplikasi per hari
     if (lastShownDate != todayDate) {
-      final random = Random();
-      final randomTip = ecoTipsList[random.nextInt(ecoTipsList.length)];
-
-      if (mounted) {
-        _showEcoTipsDialog(context, randomTip);
+      if (mounted && _currentTip != null) {
+        _showEcoTipsDialog(context, _currentTip!);
       }
-
-      // Simpen tanggal hari ini ke preference
       await prefs.setString('last_shown_eco_tips', todayDate);
     }
   }
@@ -119,8 +120,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   // Image card EcoTips
                   Image.asset(
-                    'assets/images/vectorecotips.png', // <-- Ganti sesuai nama file PNG lo
-                    height: 160, // Atur tingginya sesuai kecocokan di layar
+                    'assets/images/vectorecotips.png',
+                    height: 160,
                     fit: BoxFit.contain,
                   ),
                   const SizedBox(height: 24),
@@ -211,7 +212,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> _pages = [
-      BerandaContent(onTapMenu: _changePage),
+      BerandaContent(
+        onTapMenu: _changePage,
+        // --- TAMBAHIN INI BRO ---
+        onTapEcoTips: () {
+          if (_currentTip != null) {
+            _showEcoTipsDialog(context, _currentTip!);
+          }
+        },
+      ),
+
       PindaiScreen(
         onTapMenu: _changePage,
         previousIndex: _previousIndex,
@@ -233,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
         alignment: Alignment.topCenter,
         clipBehavior: Clip.none,
         children: [
-          // 1. BACKGROUND NAVBAR DENGAN LEKUKAN KUSTOM
+          // Navbar
           BottomAppBar(
             shape: const CircularNotchedRectangle(),
             notchMargin: 6.0,
@@ -244,20 +254,19 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 60,
               child: Row(
                 children: [
-                  // === MENU BERANDA (HITBOX DIKECILKAN) ===
+                  // Beranda
                   Expanded(
                     child: Center(
-                      // Menjaga isi tetap di tengah struktur Grid
                       child: InkWell(
                         onTap: () => _changePage(0),
                         borderRadius: BorderRadius.circular(
                           12,
-                        ), // Efek splash membulat rapi seukuran teks
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16.0,
                             vertical: 4.0,
-                          ), // Hitbox kustom yang pas
+                          ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -289,10 +298,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
-                  // SPACE UTK MELETAKKAN TOMBOL PINDAI DI TENGAH (Lebar ditambah dikit agar aman dari jari)
                   const SizedBox(width: 76),
 
-                  // === MENU EKSPLOR (HITBOX DIKECILKAN) ===
+                  // Eksplor
                   Expanded(
                     child: Center(
                       // Menjaga isi tetap di tengah struktur Grid
@@ -303,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16.0,
                             vertical: 4.0,
-                          ), // Hitbox kustom yang pas
+                          ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -339,13 +347,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // 2. TOMBOL PINDAI KOTAK + TEKS DI BAWAHNYA
+          // Pindai
           Positioned(
             top: -24,
             child: GestureDetector(
               onTap: () => _changePage(1),
               behavior: HitTestBehavior
-                  .opaque, // Memastikan area klik FAB sensitif dan akurat
+                  .opaque,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -392,10 +400,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// Konten Beranda (Tetap sama seperti kode Anda)
 class BerandaContent extends StatelessWidget {
   final Function(int) onTapMenu;
-  const BerandaContent({super.key, required this.onTapMenu});
+  final VoidCallback onTapEcoTips;
+  const BerandaContent({
+    super.key,
+    required this.onTapEcoTips,
+    required this.onTapMenu,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -422,8 +434,35 @@ class BerandaContent extends StatelessWidget {
                 children: [
                   const SizedBox(height: 20),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      GestureDetector(
+                        onTap: onTapEcoTips,
+                        child: Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8F8F0),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.grey.shade100,
+                              width: 1,
+                            ),
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Image.asset(
+                                'assets/images/ecoscanlogo.png',
+                                width:
+                                    32,
+                                height: 32,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
