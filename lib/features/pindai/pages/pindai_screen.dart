@@ -51,7 +51,7 @@ class _PindaiScreenState extends State<PindaiScreen>
   // Variabel dinamis dari AI
   String _namaSampahAI = 'Memuat...';
   String _jenisSampahAI = 'Memuat...';
-  String _hargaSampahAI = 'Rp4.000/kg';
+  String _hargaSampahAI = 'Rp-/kg';
   
   // State Skor Penilaian dari AI (Dibuat Dinamis)
   int _skorKebersihan = 0;
@@ -62,8 +62,6 @@ class _PindaiScreenState extends State<PindaiScreen>
   List<DaurUlangModel> _rekomendasiKarya = [];
 
   final Color primaryGreen = const Color(0xFF27AE60);
-  final double boxWidth = 320.0;
-  final double boxHeight = 460.0;
 
   @override
   void initState() {
@@ -426,11 +424,12 @@ class _PindaiScreenState extends State<PindaiScreen>
                         ),
                         const SizedBox(height: 16),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _buildFigmaScoreCard('Kebersihan', '$_skorKebersihan/100', _skorKebersihan / 100),
-                            _buildFigmaScoreCard('Kondisi Fisik', '$_skorKondisiFisik/100', _skorKondisiFisik / 100),
-                            _buildFigmaScoreCard('Kelayakan', '$_skorKelayakan/100', _skorKelayakan / 100),
+                            Expanded(child: _buildFigmaScoreCard('Kebersihan', '$_skorKebersihan/100', _skorKebersihan / 100)),
+                            const SizedBox(width: 8),
+                            Expanded(child: _buildFigmaScoreCard('Kondisi Fisik', '$_skorKondisiFisik/100', _skorKondisiFisik / 100)),
+                            const SizedBox(width: 8),
+                            Expanded(child: _buildFigmaScoreCard('Kelayakan', '$_skorKelayakan/100', _skorKelayakan / 100)),
                           ],
                         ),
                         const SizedBox(height: 32),
@@ -489,6 +488,16 @@ class _PindaiScreenState extends State<PindaiScreen>
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // Calculate scan box size responsively
+    final boxWidth = (screenWidth * 0.78).clamp(240.0, 320.0);
+    final boxHeight = (screenHeight * 0.50).clamp(280.0, 420.0);
+    
+    final topMargin = (screenHeight - boxHeight) / 2;
+    final bottomMargin = (screenHeight + boxHeight) / 2;
+
     return PopScope(
       canPop: !_isScanning && _galleryImage == null,
       onPopInvokedWithResult: (didPop, result) {
@@ -500,196 +509,196 @@ class _PindaiScreenState extends State<PindaiScreen>
       child: Scaffold(
         backgroundColor: Colors.black,
         body: Stack(
-        children: [
-          Positioned.fill(
-            child: _galleryImage != null
-                ? (kIsWeb
-                    ? Image.network(_galleryImage!.path, fit: BoxFit.cover)
-                    : Image.file(File(_galleryImage!.path), fit: BoxFit.cover))
-                : (_isCameraInitialized
-                    ? CameraPreview(_cameraController!)
-                    : const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(color: Color(0xFF27AE60)),
-                            SizedBox(height: 16),
-                            Text(
-                              "Menghubungkan ke kamera...",
-                              style: TextStyle(color: Colors.white, fontSize: 14),
-                            ),
-                          ],
-                        ),
-                      )),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // --- TOMBOL KIRI (BACK KHUSUS) ---
-                  _isScanning || _galleryImage != null
-                      ? CircleAvatar(
-                          backgroundColor: Colors.black45,
-                          child: IconButton(
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
-                            onPressed: _resetPindaiPage,
-                          ),
-                        )
-                      : (widget.isFromScanButton // SEKARANG BERPATOKAN PADA FLAG INI
-                          ? CircleAvatar(
-                              backgroundColor: Colors.black45,
-                              child: IconButton(
-                                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                                onPressed: () {
-                                  // Kembalikan ke Eksplor (Index 2)
-                                  widget.onTapMenu(2);
-                                },
+          children: [
+            Positioned.fill(
+              child: _galleryImage != null
+                  ? (kIsWeb
+                      ? Image.network(_galleryImage!.path, fit: BoxFit.cover)
+                      : Image.file(File(_galleryImage!.path), fit: BoxFit.cover))
+                  : (_isCameraInitialized
+                      ? CameraPreview(_cameraController!)
+                      : const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(color: Color(0xFF27AE60)),
+                              SizedBox(height: 16),
+                              Text(
+                                "Menghubungkan ke kamera...",
+                                style: TextStyle(color: Colors.white, fontSize: 14),
                               ),
-                            )
-                          : const SizedBox(width: 40, height: 40)), // Sembunyi jika lewat navbar bawah
+                            ],
+                          ),
+                        )),
+            ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // --- TOMBOL KIRI (BACK KHUSUS) ---
+                    _isScanning || _galleryImage != null
+                        ? CircleAvatar(
+                            backgroundColor: Colors.black45,
+                            child: IconButton(
+                              icon: const Icon(Icons.arrow_back, color: Colors.white),
+                              onPressed: _resetPindaiPage,
+                            ),
+                          )
+                        : (widget.isFromScanButton // SEKARANG BERPATOKAN PADA FLAG INI
+                            ? CircleAvatar(
+                                backgroundColor: Colors.black45,
+                                child: IconButton(
+                                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                                  onPressed: () {
+                                    // Kembalikan ke Eksplor (Index 2)
+                                    widget.onTapMenu(2);
+                                  },
+                                ),
+                              )
+                            : const SizedBox(width: 40, height: 40)), // Sembunyi jika lewat navbar bawah
 
-                  // --- TOMBOL KANAN (FLASH) ---
-                  CircleAvatar(
-                    backgroundColor: Colors.black45,
-                    child: IconButton(
-                      icon: const Icon(Icons.flash_on, color: Colors.white),
-                      onPressed: () {
-                        // Logika flash Anda
-                      },
+                    // --- TOMBOL KANAN (FLASH) ---
+                    CircleAvatar(
+                      backgroundColor: Colors.black45,
+                      child: IconButton(
+                        icon: const Icon(Icons.flash_on, color: Colors.white),
+                        onPressed: () {
+                          // Logika flash Anda
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Center(
+              child: Container(
+                width: boxWidth,
+                height: boxHeight,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white, width: 2.5),
+                  borderRadius: BorderRadius.circular(32),
+                ),
+              ),
+            ),
+            if (_isScanning)
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(32),
+                  child: SizedBox(
+                    width: boxWidth,
+                    height: boxHeight,
+                    child: Stack(
+                      children: [
+                        AnimatedBuilder(
+                          animation: _animationController,
+                          builder: (context, child) {
+                            return Positioned(
+                              top: _animationController.value * (boxHeight - 4),
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: primaryGreen,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: primaryGreen.withOpacity(0.6),
+                                      blurRadius: 10,
+                                      spreadRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-          Center(
-            child: Container(
-              width: boxWidth,
-              height: boxHeight,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 2.5),
-                borderRadius: BorderRadius.circular(32),
+            if (_isScanning)
+              Positioned(
+                top: (topMargin - 52).clamp(MediaQuery.of(context).padding.top + 70, topMargin - 20),
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: primaryGreen.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: const Text(
+                      'Memindai dengan AI...',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-          if (_isScanning)
-            Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(32),
-                child: SizedBox(
-                  width: boxWidth,
-                  height: boxHeight,
-                  child: Stack(
-                    children: [
-                      AnimatedBuilder(
-                        animation: _animationController,
-                        builder: (context, child) {
-                          return Positioned(
-                            top: _animationController.value * (boxHeight - 4),
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: primaryGreen,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: primaryGreen.withOpacity(0.6),
-                                    blurRadius: 10,
-                                    spreadRadius: 2,
-                                  ),
-                                ],
-                              ),
+            if (!_isScanning)
+              Positioned(
+                bottom: (screenHeight - bottomMargin > 160) ? 60 : (screenHeight - bottomMargin - 95).clamp(16.0, 40.0),
+                left: 0,
+                right: 0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.photo_library, color: Colors.white, size: 28),
+                          onPressed: _getImageFromGallery,
+                        ),
+                        const SizedBox(width: 32),
+                        GestureDetector(
+                          onTap: () {
+                            if (_galleryImage != null) {
+                              _showHasilBottomSheet();
+                            } else {
+                              _captureLiveCamera();
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 3),
                             ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          if (_isScanning)
-            Positioned(
-              top: 100,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: primaryGreen.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: const Text(
-                    'Memindai dengan AI...',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
-          if (!_isScanning)
-            Positioned(
-              bottom: 40,
-              left: 0,
-              right: 0,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.photo_library, color: Colors.white, size: 28),
-                        onPressed: _getImageFromGallery,
-                      ),
-                      const SizedBox(width: 32),
-                      GestureDetector(
-                        onTap: () {
-                          if (_galleryImage != null) {
-                            _showHasilBottomSheet();
-                          } else {
-                            _captureLiveCamera();
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 3),
-                          ),
-                          child: CircleAvatar(
-                            radius: 35,
-                            backgroundColor: Colors.white,
-                            child: _galleryImage != null
-                                ? const Icon(Icons.keyboard_arrow_up, color: Colors.black, size: 35)
-                                : const SizedBox.shrink(),
+                            child: CircleAvatar(
+                              radius: 35,
+                              backgroundColor: Colors.white,
+                              child: _galleryImage != null
+                                  ? const Icon(Icons.keyboard_arrow_up, color: Colors.black, size: 35)
+                                  : const SizedBox.shrink(),
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 32),
+                        const SizedBox(width: 48), 
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    if (_galleryImage != null)
+                      const Text(
+                        'Buka Hasil Sebelumnya',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                       ),
-                      const SizedBox(width: 32),
-                      const SizedBox(width: 48), 
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    _galleryImage != null ? 'Buka Hasil Sebelumnya' : '',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildFigmaScoreCard(String title, String score, double percentage) {
     return Container(
-      width: (MediaQuery.of(context).size.width - 64) / 3,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
         color: const Color(0xFFFAFAFA),

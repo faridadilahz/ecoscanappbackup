@@ -33,12 +33,10 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
   final MapController _mapController = MapController();
   final TextEditingController _searchController = TextEditingController();
   
-  final LatLng _kotaBogor = const LatLng(-6.5971, 106.8060);
+  final LatLng _kotaBogor = const LatLng(-6.597629, 106.799568);
   final Color primaryGreen = const Color(0xFF27AE60);
 
-  // =========================================================================
-  // DATA SUMBER DENGAN LINK YANG SUDAH DIPERBAIKI (DIUBAH KE HTTPS AMAN)
-  // =========================================================================
+
   final List<PengepulData> _daftarPengepulAsli = [
     PengepulData(
       nama: "BANK SAMPAH RANGGA MEKAR &\nRUMAH KREATIF NUSANTARA",
@@ -319,6 +317,7 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
                     controller: _searchController,
                     onChanged: _onSearchChanged,
                     onSubmitted: _executeSearch, 
+                    textAlignVertical: TextAlignVertical.center,
                     decoration: InputDecoration(
                       hintText: 'Cari tempat pengepul disini',
                       hintStyle: const TextStyle(color: Colors.black26, fontSize: 13),
@@ -330,7 +329,7 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
                             )
                           : null,
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 13),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 18),
                     ),
                   ),
                 ),
