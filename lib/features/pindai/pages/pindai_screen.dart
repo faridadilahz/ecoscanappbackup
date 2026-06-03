@@ -386,7 +386,6 @@ class _PindaiScreenState extends State<PindaiScreen>
                                 const SizedBox(height: 4),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.pop(bottomSheetContext);
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -729,7 +728,6 @@ class _PindaiScreenState extends State<PindaiScreen>
     return GestureDetector(
       onTap: () {
         context.read<HistoryProvider>().viewIde(idea.title);
-        Navigator.pop(bSheetContext);
         Navigator.push(
           context,
           MaterialPageRoute(
