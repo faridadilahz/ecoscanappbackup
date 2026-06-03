@@ -282,7 +282,7 @@ class EksplorDetailPage extends StatelessWidget {
                             ),
                             Expanded(
                               child: Text(
-                                idea.steps[index],
+                                idea.steps[index]["desc"],
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: Colors.black45,

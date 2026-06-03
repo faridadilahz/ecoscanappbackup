@@ -4,9 +4,8 @@ import 'package:ecoscan/providers/history_provider.dart';
 
 class PanduanInteraktifPage extends StatefulWidget {
   final String title;
-  // 🟢 Menerima list data langkah secara dinamis dari halaman detail
-  final List<String> steps;
-
+  // 🟢 Menerima list data langkah secara dinamis berupa Map objek dari halaman detail
+  final List<Map<String, dynamic>> steps;
   const PanduanInteraktifPage({
     super.key,
     required this.title,
@@ -43,7 +42,7 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
                 child: _isSuccessPage
                     ? _buildSuccessPage(key: const ValueKey('success'))
                     : _buildStepPage(
-                        widget.steps[_currentPage],
+                        widget.steps[_currentPage], // 🟢 Aman mengirim Map data objek penuh ke fungsi
                         key: ValueKey(_currentPage),
                       ),
               ),
@@ -84,8 +83,8 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
   }
 
   // Widget Konten Langkah Berdasarkan Index yang Sedang Aktif
-  // 🟢 SEKARANG MENERIMA STRING (Teks Instruksi)
-  Widget _buildStepPage(String stepDescription, {required Key key}) {
+  // 🟢 DIUBAH: Sekarang menerima parameter Map<String, dynamic> stepData
+  Widget _buildStepPage(Map<String, dynamic> stepData, {required Key key}) {
     return SingleChildScrollView(
       key: key,
       physics: const BouncingScrollPhysics(),
@@ -93,20 +92,24 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 24),
-          // 🟢 Angka langkah lingkaran besar di tengah atas agar lebih interaktif
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF4F9F5),
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              "${_currentPage + 1}",
-              style: const TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF17AC64),
+          const SizedBox(height: 20),
+          
+          // 🟢 MENAMPILKAN GAMBAR DINAMIS: Mengambil dari asset sesuai object data kamu
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              stepData["image"] ?? '', // Mengambil isi dari key "image"
+              height: 240,
+              width: double.infinity,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Container(
+                height: 240,
+                color: Colors.grey[100],
+                child: const Icon(
+                  Icons.image_not_supported_outlined, 
+                  size: 50, 
+                  color: Colors.black26
+                ),
               ),
             ),
           ),
@@ -127,11 +130,11 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
           ),
           const SizedBox(height: 12),
           
-          // 🟢 Isi Deskripsi Panduan dari List<String>
+          // 🟢 Isi Deskripsi Panduan dari objek key "desc"
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              stepDescription, // 🟢 Menampilkan teks instruksi daur ulang langsung di sini
+              stepData["desc"] ?? '', // Mengambil teks langkah dari key "desc"
               style: const TextStyle(
                 color: Colors.black87,
                 fontSize: 16,
