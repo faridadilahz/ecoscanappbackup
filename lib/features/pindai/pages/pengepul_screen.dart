@@ -305,7 +305,6 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  height: 46,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: _showSuggestions 
@@ -329,7 +328,7 @@ class _PengepulScreenState extends State<PengepulScreen> with TickerProviderStat
                             )
                           : null,
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 18),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),

@@ -491,9 +491,13 @@ class _PindaiScreenState extends State<PindaiScreen>
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     
-    // Calculate scan box size responsively
-    final boxWidth = (screenWidth * 0.78).clamp(240.0, 320.0);
-    final boxHeight = (screenHeight * 0.50).clamp(280.0, 420.0);
+    // Calculate scan box size responsively (smaller/compact when idle, larger when scanning)
+    final boxWidth = _isScanning 
+        ? (screenWidth * 0.78).clamp(240.0, 320.0)
+        : (screenWidth * 0.70).clamp(220.0, 280.0);
+    final boxHeight = _isScanning 
+        ? (screenHeight * 0.50).clamp(280.0, 420.0)
+        : (screenHeight * 0.40).clamp(240.0, 340.0);
     
     final topMargin = (screenHeight - boxHeight) / 2;
     final bottomMargin = (screenHeight + boxHeight) / 2;
@@ -516,7 +520,19 @@ class _PindaiScreenState extends State<PindaiScreen>
                       ? Image.network(_galleryImage!.path, fit: BoxFit.cover)
                       : Image.file(File(_galleryImage!.path), fit: BoxFit.cover))
                   : (_isCameraInitialized
-                      ? CameraPreview(_cameraController!)
+                      ? ClipRect(
+                          child: OverflowBox(
+                            alignment: Alignment.center,
+                            child: FittedBox(
+                              fit: BoxFit.cover,
+                              child: SizedBox(
+                                width: screenWidth,
+                                height: screenWidth * _cameraController!.value.aspectRatio,
+                                child: CameraPreview(_cameraController!),
+                              ),
+                            ),
+                          ),
+                        )
                       : const Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -574,7 +590,9 @@ class _PindaiScreenState extends State<PindaiScreen>
               ),
             ),
             Center(
-              child: Container(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
                 width: boxWidth,
                 height: boxHeight,
                 decoration: BoxDecoration(
@@ -587,7 +605,9 @@ class _PindaiScreenState extends State<PindaiScreen>
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(32),
-                  child: SizedBox(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
                     width: boxWidth,
                     height: boxHeight,
                     child: Stack(
@@ -622,7 +642,7 @@ class _PindaiScreenState extends State<PindaiScreen>
               ),
             if (_isScanning)
               Positioned(
-                top: (topMargin - 52).clamp(MediaQuery.of(context).padding.top + 70, topMargin - 20),
+                top: (topMargin - 105).clamp(MediaQuery.of(context).padding.top + 50, topMargin - 40),
                 left: 0,
                 right: 0,
                 child: Center(
@@ -651,7 +671,7 @@ class _PindaiScreenState extends State<PindaiScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.photo_library, color: Colors.white, size: 28),
+                          icon: const Icon(Icons.photo_library, color: Colors.white, size: 22),
                           onPressed: _getImageFromGallery,
                         ),
                         const SizedBox(width: 32),
@@ -664,16 +684,16 @@ class _PindaiScreenState extends State<PindaiScreen>
                             }
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(6),
+                            padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 3),
+                              border: Border.all(color: Colors.white, width: 2.5),
                             ),
                             child: CircleAvatar(
-                              radius: 35,
+                              radius: 28,
                               backgroundColor: Colors.white,
                               child: _galleryImage != null
-                                  ? const Icon(Icons.keyboard_arrow_up, color: Colors.black, size: 35)
+                                  ? const Icon(Icons.keyboard_arrow_up, color: Colors.black, size: 28)
                                   : const SizedBox.shrink(),
                             ),
                           ),
