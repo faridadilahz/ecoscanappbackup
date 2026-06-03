@@ -13,7 +13,7 @@ class DaurUlangModel {
   final String price;
   final String detailDescription;
   final List<Map<String, dynamic>> toolsAndMaterials;
-  final List<String> steps;
+  final List<Map<String, dynamic>> steps;
 
   DaurUlangModel({
     required this.title,
@@ -43,13 +43,32 @@ class DaurUlangModel {
         {"icon": Icons.edit_rounded, "label": "Pensil/Spidol"},
       ],
       steps: [
-        "Gambar pola wajah dan telinga kucing menggunakan pensil atau spidol pada permukaan botol plastik bekas.",
-        "Potong botol menggunakan gunting atau cutter secara perlahan mengikuti garis pola yang sudah dibuat.",
-        "Cat seluruh permukaan botol dengan warna dasar putih atau warna cerah lainnya menggunakan cat akrilik, lalu tunggu hingga kering.",
-        "Gunakan kuas kecil untuk menggambar detail mata, kumis, dan hidung kucing di bagian depan pot.",
-        "Beri lubang kecil di bagian bawah botol untuk saluran drainase air tanaman.",
-        "Masukkan tanah dan tanaman hias favoritmu. Pot tanaman kucing siap dipajang!"
+        {
+        "image": "lib/features/eksplor/images/undraw_add-color_62111.png",
+        "desc": "Gambar pola wajah dan telinga kucing menggunakan pensil atau spidol pada permukaan botol plastik bekas."
+        },
+        {
+        "image": "lib/features/eksplor/images/scissors1.png",
+        "desc": "Potong botol menggunakan gunting atau cutter secara perlahan mengikuti garis pola yang sudah dibuat."
+        },
+        {
+        "image": "lib/features/eksplor/images/undraw_making-art_c05m2.png",
+        "desc": "Cat seluruh permukaan botol dengan warna dasar putih atau warna cerah lainnya menggunakan cat akrilik, lalu tunggu hingga kering."
+        },
+        {
+        "image": "lib/features/eksplor/images/undraw_choose-color_wpfw1.png",
+        "desc": "Gunakan kuas kecil untuk menggambar detail mata, kumis, dan hidung kucing di bagian depan pot."
+        },
+        {
+        "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr1.png",
+        "desc": "Beri lubang kecil di bagian bawah botol untuk saluran drainase air tanaman."
+        },
+        {
+        "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn1.png",
+        "desc": "Masukkan tanah dan tanaman hias favoritmu. Pot tanaman kucing siap dipajang!"
+        },
       ],
+      
     ),
     DaurUlangModel(
       title: "Celengan Babi",
@@ -66,12 +85,30 @@ class DaurUlangModel {
         {"icon": Icons.layers_rounded, "label": "4 Tutup\nBotol Ekstra"},
       ],
       steps: [
-        "Bersihkan botol plastik bekas dan pastikan label kemasannya sudah terlepas sempurna.",
-        "Gunakan cutter untuk membuat celah horizontal sepanjang 3-4 cm di bagian tengah badan botol sebagai lubang masuk koin.",
-        "Warnai seluruh badan botol dan 4 buah tutup botol ekstra dengan cat akrilik berwarna merah muda (pink).",
-        "Tempelkan 4 tutup botol ekstra tersebut di bagian bawah botol menggunakan lem tembak sebagai kaki celengan.",
-        "Gambarkan pola mata pada bagian depan dekat tutup botol asli, dan buat dua lubang hitam di tutup botol utama sebagai hidung babi.",
-        "Tambahkan hiasan ekor spiral di bagian belakang botol menggunakan sisa potongan plastik atau kertas.",
+        {
+        "image": "lib/features/eksplor/images/undraw_add-color_62111.png",
+        "desc": "Bersihkan botol plastik bekas dan pastikan label kemasannya sudah terlepas sempurna."
+        },
+        {
+        "image": "lib/features/eksplor/images/scissors1.png",
+        "desc": "Gunakan cutter untuk membuat celah horizontal sepanjang 3-4 cm di bagian tengah badan botol sebagai lubang masuk koin."
+        },
+        {
+        "image": "lib/features/eksplor/images/undraw_making-art_c05m2.png",
+        "desc": "Warnai seluruh badan botol dan 4 buah tutup botol ekstra dengan cat akrilik berwarna merah muda (pink)."
+        },
+        {
+        "image": "lib/features/eksplor/images/undraw_choose-color_wpfw1.png",
+        "desc": "Tempelkan 4 tutup botol ekstra tersebut di bagian bawah botol menggunakan lem tembak sebagai kaki celengan."
+        },
+        {
+        "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr1.png",
+        "desc": "Gambarkan pola mata pada bagian depan dekat tutup botol asli, dan buat dua lubang hitam di tutup botol utama sebagai hidung babi."
+        },
+        {
+        "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn1.png",
+        "desc": "Tambahkan hiasan ekor spiral di bagian belakang botol menggunakan sisa potongan plastik atau kertas."
+        },
       ],
     ),
     DaurUlangModel(
@@ -89,12 +126,30 @@ class DaurUlangModel {
         {"icon": Icons.style_rounded, "label": "Kertas\nKado/Kain"},
       ],
       steps: [
-        "Siapkan kardus bekas kokoh, lalu potong membentuk balok ukuran kotak tisu standar jika kardus terlalu besar.",
-        "Buat lubang berbentuk oval atau persegi panjang di bagian atas penutup kardus sebagai jalur mengambil tisu.",
-        "Oleskan lem secara merata di seluruh permukaan luar kardus.",
-        "Tempelkan kertas kado bermotif estetik atau kain flanel/canvas dengan rapi tanpa menyisakan gelembung udara.",
-        "Rapikan bagian pinggir lubang tisu atas dengan melipat sisa kertas ke dalam, lalu rekatkan.",
-        "Masukkan tisu kemasan isi ulang ke dalam kotak, pasang penutupnya, dan kotak tisu siap digunakan."
+        {
+          "image": "lib/features/eksplor/images/undraw_add-color_62111.png",
+          "desc": "Siapkan kardus bekas kokoh, lalu potong membentuk balok ukuran kotak tisu standar jika kardus terlalu besar."
+        },
+        {
+          "image": "lib/features/eksplor/images/scissors1.png",
+          "desc": "Buat lubang berbentuk oval atau persegi panjang di bagian atas penutup kardus sebagai jalur mengambil tisu."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_making-art_c05m2.png",
+          "desc": "Oleskan lem secara merata di seluruh permukaan luar kardus."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_choose-color_wpfw1.png",
+          "desc": "Tempelkan kertas kado bermotif estetik atau kain flanel/canvas dengan rapi tanpa menyisakan gelembung udara."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr1.png",
+          "desc": "Rapikan bagian pinggir lubang tisu atas dengan melipat sisa kertas ke dalam, lalu rekatkan."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn1.png",
+          "desc": "Masukkan tisu kemasan isi ulang ke dalam kotak, pasang penutupnya, dan kotak tisu siap digunakan."
+        },
       ],
     ),
     DaurUlangModel(
@@ -112,12 +167,30 @@ class DaurUlangModel {
         {"icon": Icons.architecture_rounded, "label": "Lidi/Kawat"},
       ],
       steps: [
-        "Potong kertas origami berwarna cerah menjadi beberapa bagian berbentuk persegi ukuran 10x10 cm.",
-        "Lipat kertas secara diagonal beberapa kali, lalu gunting bagian ujungnya melengkung membentuk kelopak bunga.",
-        "Buka lipatan kertas, maka kamu akan mendapatkan bentuk dasar bunga bermahkota indah.",
-        "Gunakan lidi atau kawat kecil yang dibalut kertas hijau sebagai batang bunga.",
-        "Tusukkan batang ke bagian tengah bunga krtas lalu kunci posisinya menggunakan sedikit lem kertas.",
-        "Satukan beberapa tangkai bunga ke dalam vas kecil dari botol bekas untuk diletakkan di meja."
+        {
+          "image": "lib/features/eksplor/images/undraw_add-color_62111.png",
+          "desc": "Potong kertas origami berwarna cerah menjadi beberapa bagian berbentuk persegi ukuran 10x10 cm."
+        },
+        {
+          "image": "lib/features/eksplor/images/scissors1.png",
+          "desc": "Lipat kertas secara diagonal beberapa kali, lalu gunting bagian ujungnya melengkung membentuk kelopak bunga."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_making-art_c05m2.png",
+          "desc": "Buka lipatan kertas, maka kamu akan mendapatkan bentuk dasar bunga bermahkota indah."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_choose-color_wpfw1.png",
+          "desc": "Gunakan lidi atau kawat kecil yang dibalut kertas hijau sebagai batang bunga."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr1.png",
+          "desc": "Tusukkan batang ke bagian tengah bunga krtas lalu kunci posisinya menggunakan sedikit lem kertas."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn1.png",
+          "desc": "Satukan beberapa tangkai bunga ke dalam vas kecil dari botol bekas untuk diletakkan di meja."
+        },
       ],
     ),
     DaurUlangModel(
@@ -135,12 +208,30 @@ class DaurUlangModel {
         {"icon": Icons.format_color_fill_rounded, "label": "Cat Semprot"},
       ],
       steps: [
-        "Bersihkan botol plastik besar, tandai garis vertikal di sekeliling badan botol dengan jarak masing-masing 1.5 cm menggunakan penggaris.",
-        "Iris perlahan garis vertikal tersebut menggunakan cutter (jangan sampai memotong bagian ujung atas dan bawah botol).",
-        "Tekan botol dari arah atas ke bawah secara lembut agar bilah irisan plastik mekar dan menekuk keluar membentuk lampion.",
-        "Warnai lampion menggunakan cat semprot transparan atau warna metalik emas/perak sesuai seleramu.",
-        "Buat lubang pada tutup botol untuk memasukkan kabel fitting lampu LED.",
-        "Pasang rangkaian lampu ke dalam botol, gantungkan lampion di teras rumah, lalu nyalakan di malam hari."
+        {
+          "image": "lib/features/eksplor/images/undraw_add-color_62111.png",
+          "desc": "Bersihkan botol plastik besar, tandai garis vertikal di sekeliling badan botol dengan jarak masing-masing 1.5 cm menggunakan penggaris."
+        },
+        {
+          "image": "lib/features/eksplor/images/scissors1.png",
+          "desc": "Iris perlahan garis vertikal tersebut menggunakan cutter (jangan sampai memotong bagian ujung atas dan bawah botol)."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_making-art_c05m2.png",
+          "desc": "Tekan botol dari arah atas ke bawah secara lembut agar bilah irisan plastik mekar dan menekuk keluar membentuk lampion."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_choose-color_wpfw1.png",
+          "desc": "Warnai lampion menggunakan cat semprot transparan atau warna metalik emas/perak sesuai seleramu."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr1.png",
+          "desc": "Buat lubang pada tutup botol untuk memasukkan kabel fitting lampu LED."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn1.png",
+          "desc": "Pasang rangkaian lampu ke dalam botol, gantungkan lampion di teras rumah, lalu nyalakan di malam hari."
+        },
       ],
     ),
     DaurUlangModel(
@@ -158,12 +249,30 @@ class DaurUlangModel {
         {"icon": Icons.hardware_rounded, "label": "Tusuk Sate"},
       ],
       steps: [
-        "Potong kardus berbentuk persegi panjang, lalu buat lekukan di bagian atas untuk ruang kemudi mobil.",
-        "Lubangi bagian sisi samping bawah kardus di dua titik depan dan belakang untuk memasukkan poros roda.",
-        "Potong tusuk sate sepanjang lebar kardus ditambah 2 cm sebagai poros as roda mobil.",
-        "Lubangi bagian tengah dari 4 tutup botol besar, lalu pasangkan ke ujung-ujung tusuk sate sebagai roda.",
-        "Gunakan lem tembak pada ujung poros agar roda terpasang kuat namun tetap dapat berputar.",
-        "Hias mobil dengan menambahkan gambar lampu depan, plat nomor, dan stir kemudi dari sisa potongan kertas."
+        {
+          "image": "lib/features/eksplor/images/undraw_add-color_62111.png",
+          "desc": "Potong kardus berbentuk persegi panjang, lalu buat lekukan di bagian atas untuk ruang kemudi mobil."
+        },
+        {
+          "image": "lib/features/eksplor/images/scissors1.png",
+          "desc": "Lubangi bagian sisi samping bawah kardus di dua titik depan dan belakang untuk memasukkan poros roda."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_making-art_c05m2.png",
+          "desc": "Potong tusuk sate sepanjang lebar kardus ditambah 2 cm sebagai poros as roda mobil."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_choose-color_wpfw1.png",
+          "desc": "Lubangi bagian tengah dari 4 tutup botol besar, lalu pasangkan ke ujung-ujung tusuk sate sebagai roda."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr1.png",
+          "desc": "Gunakan lem tembak pada ujung poros agar roda terpasang kuat namun tetap dapat berputar."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn1.png",
+          "desc": "Hias mobil dengan menambahkan gambar lampu depan, plat nomor, dan stir kemudi dari sisa potongan kertas."
+        },
       ],
     ),
     DaurUlangModel(
@@ -181,12 +290,30 @@ class DaurUlangModel {
         {"icon": Icons.brush_rounded, "label": "Spidol\nSpi/Cat"},
       ],
       steps: [
-        "Potong botol plastik secara horizontal tepat di bagian tengah menggunakan gunting atau cutter.",
-        "Ambil potongan silinder bagian bawah botol dan buang potongan bagian atasnya.",
-        "Gunakan kertas amplas halus atau setrika hangat sebentar pada ujung bekas potongan agar tidak tajam.",
-        "Lapisi lingkar atas botol dengan pita hias kain untuk menutupi tekstur potongan plastik.",
-        "Gambar pola geometris atau garis minimalis menggunakan spidol permanen di sekeliling badan botol.",
-        "Tempatkan alat tulismu di dalam wadah baru ini. Selesai!"
+        {
+          "image": "lib/features/eksplor/images/undraw_add-color_62111.png",
+          "desc": "Potong botol plastik secara horizontal tepat di bagian tengah menggunakan gunting atau cutter."
+        },
+        {
+          "image": "lib/features/eksplor/images/scissors1.png",
+          "desc": "Ambil potongan silinder bagian bawah botol dan buang potongan bagian atasnya."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_making-art_c05m2.png",
+          "desc": "Gunakan kertas amplas halus atau setrika hangat sebentar pada ujung bekas potongan agar tidak tajam."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_choose-color_wpfw1.png",
+          "desc": "Lapisi lingkar atas botol dengan pita hias kain untuk menutupi tekstur potongan plastik."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr1.png",
+          "desc": "Gambar pola geometris atau garis minimalis menggunakan spidol permanen di sekeliling badan botol."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn1.png",
+          "desc": "Tempatkan alat tulismu di dalam wadah baru ini. Selesai!"
+        },
       ],
     ),
     DaurUlangModel(
@@ -204,12 +331,30 @@ class DaurUlangModel {
         {"icon": Icons.linear_scale_rounded, "label": "Meteran"},
       ],
       steps: [
-        "Potong kardus tebal menjadi beberapa lembar panel utama: 2 panel samping, 1 panel belakang, dan 3 panel sekat horizontal.",
-        "Buat pola celah interlocking (saling mengunci) pada panel samping agar sekat horizontal bisa terpasang presisi.",
-        "Rakit lembaran kardus tersebut mengikuti bentuk kotak rak, perkuat setiap sambungan sudut menggunakan lem tembak tebal.",
-        "Lapisi lembaran luar rak dengan kertas karton polos tebal berwarna kraft atau putih untuk menutup pori-pori kardus.",
-        "Pastikan lem mengering sempurna selama 15 menit dan tes kekuatan rak dengan menekan sekatnya pelan-pelan.",
-        "Rak buku mini siap diletakkan di sudut meja untuk menampung buku-buku favoritmu."
+        {
+          "image": "lib/features/eksplor/images/undraw_add-color_62111.png",
+          "desc": "Potong kardus tebal menjadi beberapa lembar panel utama: 2 panel samping, 1 panel belakang, dan 3 panel sekat horizontal."
+        },
+        {
+          "image": "lib/features/eksplor/images/scissors1.png",
+          "desc": "Buat pola celah interlocking (saling mengunci) pada panel samping agar sekat horizontal bisa terpasang presisi."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_making-art_c05m2.png",
+          "desc": "Rakit lembaran kardus tersebut mengikuti bentuk kotak rak, perkuat setiap sambungan sudut menggunakan lem tembak tebal."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_choose-color_wpfw1.png",
+          "desc": "Lapisi lembaran luar rak dengan kertas karton polos tebal berwarna kraft atau putih untuk menutup pori-pori kardus."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr1.png",
+          "desc": "Pastikan lem mengering sempurna selama 15 menit dan tes kekuatan rak dengan menekan sekatnya pelan-pelan."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn1.png",
+          "desc": "Rak buku mini siap diletakkan di sudut meja untuk menampung buku-buku favoritmu."
+        },
       ],
     ),
     DaurUlangModel(
@@ -229,12 +374,30 @@ class DaurUlangModel {
         {"icon": Icons.copy_rounded, "label": "Kertas\nHVS/Perkamen"},
       ],
       steps: [
-        "Kumpulkan kantong kresek bekas sewarna, gunting bagian pegangan dan alas bawahnya hingga berbentuk silinder lembaran.",
-        "Tumpuk 4-6 lembar plastik kresek secara sejajar di atas meja.",
-        "Apit tumpukan plastik tersebut menggunakan dua lembar kertas perkamen/HVS di bagian atas dan bawahnya agar tidak meleleh langsung.",
-        "Setrika dengan suhu sedang di atas kertas HVS secara merata selama beberapa detik hingga plastik melebur menyatu menjadi lembaran tebal.",
-        "Potong lembaran plastik tebal baru tersebut membentuk pola tas belanja (badan depan, belakang, dan tali tali bawaan).",
-        "Satukan tepi lipatan tas menggunakan lem industri khusus plastik atau jahit manual dengan benang tebal."
+        {
+          "image": "lib/features/eksplor/images/undraw_add-color_62111.png",
+          "desc": "Kumpulkan kantong kresek bekas sewarna, gunting bagian pegangan dan alas bawahnya hingga berbentuk silinder lembaran."
+        },
+        {
+          "image": "lib/features/eksplor/images/scissors1.png",
+          "desc": "Tumpuk 4-6 lembar plastik kresek secara sejajar di atas meja."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_making-art_c05m2.png",
+          "desc": "Apit tumpukan plastik tersebut menggunakan dua lembar kertas perkamen/HVS di bagian atas dan bawahnya agar tidak meleleh langsung."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_choose-color_wpfw1.png",
+          "desc": "Setrika dengan suhu sedang di atas kertas HVS secara merata selama beberapa detik hingga plastik melebur menyatu menjadi lembaran tebal."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr1.png",
+          "desc": "Potong lembaran plastik tebal baru tersebut membentuk pola tas belanja (badan depan, belakang, dan tali tali bawaan)."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn1.png",
+          "desc": "Satukan tepi lipatan tas menggunakan lem industri khusus plastik atau jahit manual dengan benang tebal."
+        },
       ],
     ),
     DaurUlangModel(
@@ -252,12 +415,30 @@ class DaurUlangModel {
         {"icon": Icons.architecture_rounded, "label": "Penggaris"},
       ],
       steps: [
-        "Potong kertas tebal membentuk persegi berukuran tepat 12x12 cm.",
-        "Lipat kertas menjadi bentuk segitiga sama kaki, pastikan semua sudutnya saling berhimpit rapi.",
-        "Lipat kedua sudut bagian bawah segitiga mengarah ke atas menuju titik puncak sudut, lalu buka kembali lipatannya.",
-        "Ambil satu lapisan ujung atas segitiga dan lipat ke arah bawah dasar sebagai kantung selipan halaman.",
-        "Masukkan kembali lipatan sisi samping tadi ke dalam kantung yang terbentuk hingga terkunci menjadi saku segitiga sudut.",
-        "Gunakan spidol warna untuk menghias permukaan pembatas buku dengan gambar ekspresi kartun atau kutipan quotes motivasi."
+        {
+          "image": "lib/features/eksplor/images/undraw_add-color_62111.png",
+          "desc": "Potong kertas tebal membentuk persegi berukuran tepat 12x12 cm."
+        },
+        {
+          "image": "lib/features/eksplor/images/scissors1.png",
+          "desc": "Lipat kertas menjadi bentuk segitiga sama kaki, pastikan semua sudutnya saling berhimpit rapi."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_making-art_c05m2.png",
+          "desc": "Lipat kedua sudut bagian bawah segitiga mengarah ke atas menuju titik puncak sudut, lalu buka kembali lipatannya."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_choose-color_wpfw1.png",
+          "desc": "Ambil satu lapisan ujung atas segitiga dan lipat ke arah bawah dasar sebagai kantung selipan halaman."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr1.png",
+          "desc": "Masukkan kembali lipatan sisi samping tadi ke dalam kantung yang terbentuk hingga terkunci menjadi saku segitiga sudut."
+        },
+        {
+          "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn1.png",
+          "desc": "Gunakan spidol warna untuk menghias permukaan pembatas buku dengan gambar ekspresi kartun atau kutipan quotes motivasi."
+        },
       ],
     ),
   ];

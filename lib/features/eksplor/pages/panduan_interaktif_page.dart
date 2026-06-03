@@ -4,8 +4,13 @@ import 'package:ecoscan/providers/history_provider.dart';
 
 class PanduanInteraktifPage extends StatefulWidget {
   final String title;
-
-  const PanduanInteraktifPage({super.key, required this.title});
+  // 🟢 Menerima list data langkah secara dinamis berupa Map objek dari halaman detail
+  final List<Map<String, dynamic>> steps;
+  const PanduanInteraktifPage({
+    super.key,
+    required this.title,
+    required this.steps,
+  });
 
   @override
   State<PanduanInteraktifPage> createState() => _PanduanInteraktifPageState();
@@ -14,47 +19,8 @@ class PanduanInteraktifPage extends StatefulWidget {
 class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
   int _currentPage = 0;
 
-  // Data panduan langkah 1 - 6
-  final List<Map<String, String>> _steps = [
-    {
-      "title": "Gambar Pola",
-      "desc":
-          "Buat pola pada botol bekas sesuai kreativitasmu, seperti hewan, bunga, atau buah-buahan.",
-      "image": "lib/features/eksplor/images/undraw_social-strategy_v9qr1.png",
-    },
-    {
-      "title": "Potong Sesuai Pola",
-      "desc":
-          "Gunakan gunting atau cutter untuk memotong botol mengikuti garis pola yang sudah digambar.",
-      "image": "lib/features/eksplor/images/undraw_making-art_c05m2.png",
-    },
-    {
-      "title": "Beri Warna Dasar",
-      "desc":
-          "Siapkan cat akrilik lalu warnai seluruh permukaan botol dengan warna dasar, misalnya putih.",
-      "image": "lib/features/eksplor/images/undraw_choose-color_wpfw1.png",
-    },
-    {
-      "title": "Tambahkan Warna",
-      "desc":
-          "Warnai kembali sesuai karakter atau desain yang telah kamu buat sebelumnya.",
-      "image": "lib/features/eksplor/images/undraw_add-color_62111.png",
-    },
-    {
-      "title": "Keringkan Cat",
-      "desc":
-          "Diamkan sebentar hingga cat benar-benar kering agar cat tidak luntur.",
-      "image": "lib/features/eksplor/images/undraw_a-moment-to-relax_mrkn1.png",
-    },
-    {
-      "title": "Pot Siap Digunakan",
-      "desc":
-          "Botol bekas kini siap dijadikan pot bunga yang cantik dan bermanfaat.",
-      "image": "lib/features/eksplor/images/scissors1.png",
-    },
-  ];
-
-  bool get _isSuccessPage => _currentPage == _steps.length;
+  // 🟢 Halaman sukses aktif ketika index melampaui jumlah data di list steps
+  bool get _isSuccessPage => _currentPage == widget.steps.length;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +32,7 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
             // Header back button hanya muncul jika bukan di halaman sukses
             if (!_isSuccessPage) _buildTopHeader(),
 
-            // Bagian Konten yang bisa berubah (Langkah 1-6 atau Sukses)
+            // Bagian Konten (Langkah dinamis atau Halaman Sukses) dengan transisi smooth
             Expanded(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
@@ -76,13 +42,13 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
                 child: _isSuccessPage
                     ? _buildSuccessPage(key: const ValueKey('success'))
                     : _buildStepPage(
-                        _steps[_currentPage],
+                        widget.steps[_currentPage], // 🟢 Aman mengirim Map data objek penuh ke fungsi
                         key: ValueKey(_currentPage),
                       ),
               ),
             ),
 
-            // Navigasi bawah dipasang FIX di sini (hanya jika bukan halaman sukses)
+            // Navigasi bawah statis (hanya jika bukan halaman sukses)
             if (!_isSuccessPage) _buildBottomNavigation(),
           ],
         ),
@@ -116,8 +82,9 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
     );
   }
 
-  // Widget Konten Langkah (Hanya gambar dan teks yang di-scroll)
-  Widget _buildStepPage(Map<String, String> step, {required Key key}) {
+  // Widget Konten Langkah Berdasarkan Index yang Sedang Aktif
+  // 🟢 DIUBAH: Sekarang menerima parameter Map<String, dynamic> stepData
+  Widget _buildStepPage(Map<String, dynamic> stepData, {required Key key}) {
     return SingleChildScrollView(
       key: key,
       physics: const BouncingScrollPhysics(),
@@ -125,24 +92,36 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 10),
-          Image.asset(
-            step["image"]!,
-            height: 220,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => const Icon(
-              Icons.image_outlined,
-              size: 100,
-              color: Colors.black12,
+          const SizedBox(height: 20),
+          
+          // 🟢 MENAMPILKAN GAMBAR DINAMIS: Mengambil dari asset sesuai object data kamu
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              stepData["image"] ?? '', // Mengambil isi dari key "image"
+              height: 240,
+              width: double.infinity,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Container(
+                height: 240,
+                color: Colors.grey[100],
+                child: const Icon(
+                  Icons.image_not_supported_outlined, 
+                  size: 50, 
+                  color: Colors.black26
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 32),
+          
+          // 🟢 Judul Langkah Dinamis
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              step["title"]!,
+              "Langkah ${_currentPage + 1}",
               style: const TextStyle(
-                fontSize: 28,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF1E1E1E),
                 letterSpacing: -0.5,
@@ -150,26 +129,29 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
             ),
           ),
           const SizedBox(height: 12),
+          
+          // 🟢 Isi Deskripsi Panduan dari objek key "desc"
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              step["desc"]!,
+              stepData["desc"] ?? '', // Mengambil teks langkah dari key "desc"
               style: const TextStyle(
-                color: Colors.black54,
-                fontSize: 15,
-                height: 1.5,
+                color: Colors.black87,
+                fontSize: 16,
+                height: 1.6,
               ),
             ),
           ),
-          const SizedBox(height: 24), // Spacing aman bawah scroll
+          const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  // Widget Bottom Navigation Kontrol (Fixed di bawah luar scrollview)
+  // Widget Navigasi Bawah Otomatis Menyesuaikan Jumlah Langkah Dinamis
   Widget _buildBottomNavigation() {
     final isFirstPage = _currentPage == 0;
+    final isLastStep = _currentPage == widget.steps.length - 1;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24.0, 12.0, 24.0, 20.0),
@@ -178,6 +160,7 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
         children: [
           Row(
             children: [
+              // Tombol Kembali / Sebelumnya
               Expanded(
                 child: OutlinedButton(
                   onPressed: () {
@@ -217,10 +200,15 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
                 ),
               ),
               const SizedBox(width: 12),
+              // Tombol Selanjutnya / Selesai
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
                     setState(() {
+                      if (isLastStep) {
+                        // Simpan data barang ke history provider saat menekan Selesai di langkah terakhir
+                        context.read<HistoryProvider>().createBarang(widget.title);
+                      }
                       _currentPage++;
                     });
                   },
@@ -233,18 +221,21 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Selanjutnya",
-                        style: TextStyle(
+                        isLastStep ? "Selesai" : "Selanjutnya",
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
                         ),
                       ),
-                      SizedBox(width: 6),
-                      Icon(Icons.arrow_forward_rounded, size: 16),
+                      const SizedBox(width: 6),
+                      Icon(
+                        isLastStep ? Icons.check_rounded : Icons.arrow_forward_rounded,
+                        size: 16,
+                      ),
                     ],
                   ),
                 ),
@@ -253,10 +244,10 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
           ),
           const SizedBox(height: 20),
 
-          // Indikator Bulat Smooth Gliding
+          // Indikator Titik Slider Smooth Sesuai Jumlah Langkah Dinamis
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(_steps.length, (index) {
+            children: List.generate(widget.steps.length, (index) {
               final isSelected = index == _currentPage;
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
@@ -275,7 +266,7 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
           ),
           const SizedBox(height: 12),
           Text(
-            "Langkah ${_currentPage + 1} dari ${_steps.length}",
+            "Langkah ${_currentPage + 1} dari ${widget.steps.length}",
             style: const TextStyle(
               color: Colors.black26,
               fontSize: 13,
@@ -287,7 +278,7 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
     );
   }
 
-  // Halaman Selamat (Success Screen) - FIXED CENTERED
+  // Halaman Sukses yang Fleksibel Menyesuaikan Judul Barang Dinamis
   Widget _buildSuccessPage({required Key key}) {
     return SingleChildScrollView(
       key: key,
@@ -296,7 +287,6 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: 40),
-          // Badge Selamat
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -326,20 +316,17 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
             ),
           ),
           const SizedBox(height: 12),
-          const Text(
-            "Kamu telah mengolah botol plastik hari ini. Aksimu ini membantu mengurangi sampah dan menjaga keseimbangan lingkungan.",
+          Text(
+            "Kamu telah berhasil membuat '${widget.title}' hari ini. Aksimu ini membantu mengurangi sampah dan menjaga keseimbangan lingkungan.",
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black45, fontSize: 15, height: 1.5),
+            style: const TextStyle(color: Colors.black45, fontSize: 15, height: 1.5),
           ),
           const SizedBox(height: 40),
-          // Tombol Selesai
           SizedBox(
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
               onPressed: () {
-                context.read<HistoryProvider>().createBarang(widget.title);
-
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
@@ -351,17 +338,16 @@ class _PanduanInteraktifPageState extends State<PanduanInteraktifPage> {
                 ),
               ),
               child: const Text(
-                "Selesai",
+                "Kembali ke Menu Utama",
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
             ),
           ),
           const SizedBox(height: 8),
-          // Tombol Kembali ke langkah terakhir
           TextButton(
             onPressed: () {
               setState(() {
-                _currentPage = _steps.length - 1;
+                _currentPage = widget.steps.length - 1;
               });
             },
             style: TextButton.styleFrom(foregroundColor: Colors.black45),

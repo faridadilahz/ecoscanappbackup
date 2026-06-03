@@ -282,7 +282,7 @@ class EksplorDetailPage extends StatelessWidget {
                             ),
                             Expanded(
                               child: Text(
-                                idea.steps[index],
+                                idea.steps[index]["desc"],
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: Colors.black45,
@@ -306,8 +306,10 @@ class EksplorDetailPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                PanduanInteraktifPage(title: idea.title),
+                            builder: (context) => PanduanInteraktifPage(
+                              title: idea.title, // Judul dinamis (Misal: "Pot Bunga Botol", "Celengan Kardus")
+                              steps: idea.steps, // List Map langkah-langkah unik miliknya masing-masing
+                            ),
                           ),
                         );
                       },
