@@ -294,6 +294,7 @@ class _PindaiScreenState extends State<PindaiScreen>
   }
 
   void _resetPindaiPage() {
+    _scanSessionCounter++; // Batalkan sesi pemindaian aktif agar hasil API diabaikan
     setState(() {
       _galleryImage = null;
       _isScanning = false;
@@ -385,6 +386,7 @@ class _PindaiScreenState extends State<PindaiScreen>
                                 const SizedBox(height: 4),
                                 GestureDetector(
                                   onTap: () {
+                                    Navigator.pop(bottomSheetContext);
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -474,7 +476,7 @@ class _PindaiScreenState extends State<PindaiScreen>
       },
     ).then((_) {
       if (mounted) {
-        setState(() {});
+        _resetPindaiPage();
       }
     });
   }
@@ -488,9 +490,17 @@ class _PindaiScreenState extends State<PindaiScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
+    return PopScope(
+      canPop: !_isScanning && _galleryImage == null,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_isScanning || _galleryImage != null) {
+          _resetPindaiPage();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
         children: [
           Positioned.fill(
             child: _galleryImage != null
@@ -674,8 +684,9 @@ class _PindaiScreenState extends State<PindaiScreen>
             ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildFigmaScoreCard(String title, String score, double percentage) {
     return Container(
@@ -718,6 +729,7 @@ class _PindaiScreenState extends State<PindaiScreen>
     return GestureDetector(
       onTap: () {
         context.read<HistoryProvider>().viewIde(idea.title);
+        Navigator.pop(bSheetContext);
         Navigator.push(
           context,
           MaterialPageRoute(
