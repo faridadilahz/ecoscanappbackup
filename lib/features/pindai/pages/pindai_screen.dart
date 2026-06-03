@@ -491,9 +491,9 @@ class _PindaiScreenState extends State<PindaiScreen>
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     
-    // Calculate scan box size responsively
-    final boxWidth = (screenWidth * 0.78).clamp(240.0, 320.0);
-    final boxHeight = (screenHeight * 0.50).clamp(280.0, 420.0);
+    // Calculate scan box size responsively (smaller, cleaner proportions)
+    final boxWidth = (screenWidth * 0.70).clamp(220.0, 280.0);
+    final boxHeight = (screenHeight * 0.40).clamp(240.0, 340.0);
     
     final topMargin = (screenHeight - boxHeight) / 2;
     final bottomMargin = (screenHeight + boxHeight) / 2;
@@ -516,7 +516,19 @@ class _PindaiScreenState extends State<PindaiScreen>
                       ? Image.network(_galleryImage!.path, fit: BoxFit.cover)
                       : Image.file(File(_galleryImage!.path), fit: BoxFit.cover))
                   : (_isCameraInitialized
-                      ? CameraPreview(_cameraController!)
+                      ? ClipRect(
+                          child: OverflowBox(
+                            alignment: Alignment.center,
+                            child: FittedBox(
+                              fit: BoxFit.cover,
+                              child: SizedBox(
+                                width: screenWidth,
+                                height: screenWidth * _cameraController!.value.aspectRatio,
+                                child: CameraPreview(_cameraController!),
+                              ),
+                            ),
+                          ),
+                        )
                       : const Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
