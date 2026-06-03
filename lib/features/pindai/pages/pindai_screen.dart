@@ -642,7 +642,7 @@ class _PindaiScreenState extends State<PindaiScreen>
               ),
             if (_isScanning)
               Positioned(
-                top: (topMargin - 75).clamp(MediaQuery.of(context).padding.top + 60, topMargin - 30),
+                top: (topMargin - 105).clamp(MediaQuery.of(context).padding.top + 50, topMargin - 40),
                 left: 0,
                 right: 0,
                 child: Center(
