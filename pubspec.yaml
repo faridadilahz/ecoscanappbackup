@@ -60,6 +60,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: 0.14.4
+  flutter_native_splash: ^2.4.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -77,6 +79,21 @@ flutter:
     - family: Bricolage-Grotesque
       fonts:
         - asset: assets/fonts/BricolageGrotesque.ttf
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/ecoscanlogo.png"
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  # color_dark: "#FFFFFF"
+  image: "assets/icon/ecoscanlogotransparent.png"
+  android_12:
+    color: "#FFFFFF"
+    # color_dark: "#FFFFFF"
+    image: "assets/icon/ecoscanlogotransparent.png"
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:
